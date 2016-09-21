@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateImportInfosTable extends Migration
+class CreateDataComparisonsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,15 @@ class CreateImportInfosTable extends Migration
      */
     public function up()
     {
-        Schema::create('import_infos', function (Blueprint $table) {
+        Schema::create('data_comparisons', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->integer('total_row');
+
+            $table->integer('import_id')->unsigned();
+            $table->foreign('import_id')->references('id')->on('import_infos');
+
+            $table->string('name', 255);
+            $table->text('row_data');
+
             $table->timestamps();
         });
     }
@@ -28,6 +33,6 @@ class CreateImportInfosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('import_infos');
+        Schema::dropIfExists('data_comparisons');
     }
 }

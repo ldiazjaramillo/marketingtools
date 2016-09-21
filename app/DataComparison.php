@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ImportInfo extends Model
+class DataComparison extends Model
 {
     //
 }
