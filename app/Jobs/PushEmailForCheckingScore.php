@@ -47,12 +47,17 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1'), 1);
 
-            $score = $request['score']*100;
+            if(!$request['format_valid']){
+                Log::warning('Invalid email ' . $email);
+                continue;
+            } else {
+                $score = $request['score']*100;
 
-            Log::info('Get score for '.$email . ' ' . $score);
+                Log::info('Get score for '.$email . ' ' . $score);
 
-            $result[$score] = $email;
-            $emails[] = $email;
+                $result[$score] = $email;
+                $emails[] = $email;
+            }
 
             if( (is_null($request['catch_all']) || $request['catch_all'] == false) && $score >= 85){
 
