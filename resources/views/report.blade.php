@@ -79,11 +79,11 @@
                 <tr>
                     <td>
                         <h2>{{$success->count()}}</h2>
-                        <a href="?type=success" target="_blank">load</a>
+                        <a href="?type=success" target="_blank">download</a>
                     </td>
                     <td>
                         <h2>{{$bad->count()}}</h2>
-                        <a href="?type=bad" target="_blank">load</a>
+                        <a href="?type=bad" target="_blank">download</a>
                     </td>
                     <td>
                         <h2>{{$queue->count()}}</h2>
