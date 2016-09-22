@@ -20,7 +20,7 @@
     <target name="build-parallel-clean"
             depends="clean,build-common,tools-parallel" />
 
-    <target name="build-common" depends="lint,prepare,storage-permissions,composer,migrate,frontend,restdoc,storage-permissions" />
+    <target name="build-common" depends="lint,prepare,storage-permissions,composer,migrate,storage-permissions" />
 
     <target name="tools-parallel" description="Run tools in parallel">
         <parallel threadCount="2">
@@ -71,22 +71,6 @@
             <arg value="artisan" />
             <arg value="db:seed" />
         </exec>
-    </target>
-
-    <target name="frontend" depends="bower-install" description="Install or update frontend dependencies" />
-
-    <target name="bower-install" description="Installing dependencies">
-        <echo>Installing dependencies</echo>
-        <exec executable="bower" failonerror="true">
-            <arg value="install" />
-            <arg value="--allow-root" />
-            <arg value="--force-latest" />
-        </exec>
-    </target>
-
-    <target name="gulp" description="Run gulp">
-        <echo>Run gulp</echo>
-        <exec executable="gulp" failonerror="true"></exec>
     </target>
 
     <!--// Check to see it the vendor folder already exist, if so, then no reason to run //-->
