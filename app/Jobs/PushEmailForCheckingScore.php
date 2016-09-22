@@ -54,19 +54,30 @@ class PushEmailForCheckingScore implements ShouldQueue
             $result[$score] = $email;
             $emails[] = $email;
 
-            if($score >= 85 && $request['catch_all'] == false){
+            if( (is_null($request['catch_all']) || $request['catch_all'] == false) && $score >= 85){
 
                 $keys = array_keys($result);
 
                 $score = max($keys);
                 $email = $result[$score];
-                
+
                 Log::notice('Select best score for ' . $email.' '.$score);
                 Log::notice('JSON ' . json_encode($result));
 
                 DataComparison::where(['id' => $data_id])->update([
                     'score' => $score,
                     'email' => $email
+                ]);
+
+                return true;
+
+            } elseif ($request['catch_all'] == true){
+
+                Log::warning('Catch all for ' . $email . ' score ' . $score);
+
+                DataComparison::where(['id' => $data_id])->update([
+                    'score' => 0,
+                    'email' => false
                 ]);
 
                 return true;
