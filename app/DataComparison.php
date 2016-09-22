@@ -15,7 +15,7 @@ class DataComparison extends Model
 
 	static public function getVariableEmailName($name = ''){
 
-		$pattern = '/[-,!@#$%^&\*\(\)><]/';
+		$pattern = '/[-,!@#$%^&\*\(\)><\']/';
 		$replacement = ' ';
 
 		$name = trim(preg_replace($pattern, $replacement, strtolower($name)));
