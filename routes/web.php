@@ -83,7 +83,7 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
                 'data_id' => $dataItem->id,
                 'name' => $dataItem->name,
                 'domain' => $dataItem->site
-            ]))->onQueue('data_id'.$dataItem->import_id)
+            ]))->onQueue('default')
         );
     }
 
@@ -92,10 +92,10 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
 
 Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
-
-    $success = \App\DataComparison::where('email', '!=' , 0)->where(['import_id' => $id]);
+    
+    $success = \App\DataComparison::where('score', '>', 0)->where(['import_id' => $id]);
     $bad = \App\DataComparison::where(['import_id' => $id])->where('email', '=', 0);
-    $queue = \Illuminate\Support\Facades\DB::table('jobs')->where(['queue' => 'data_id'.$id]);
+    $queue = \App\DataComparison::whereNull('score')->where(['import_id' => $id]);
 
     $type_report = \Illuminate\Support\Facades\Input::get('type');
 
@@ -105,7 +105,12 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
         $bad = $bad->get();
         return Maatwebsite\Excel\Facades\Excel::create('Bad - ' . $info->name, function($excel) use ($bad){
             $excel->sheet('Sheetname', function($sheet) use ($bad){
-                foreach ($bad as $item){ $sheet->appendRow($item->row_data); }
+                foreach ($bad as $item){
+                    $array = (array) $item->row_data;
+                    $array[] = $item->email;
+                    $array[] = $item->score;
+                    $sheet->appendRow($array);
+                }
             });
         })->export('csv');
 
@@ -114,10 +119,15 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
         $success = $success->get();
         return Maatwebsite\Excel\Facades\Excel::create('Success - ' . $info->name, function($excel) use ($success){
             $excel->sheet('Sheetname', function($sheet) use ($success){
-                foreach ($success as $item){ $sheet->appendRow($item->row_data); }
+                foreach ($success as $item){
+                    $array = (array) $item->row_data;
+                    $array[] = $item->email;
+                    $array[] = $item->score;
+                    $sheet->appendRow($array);
+                }
             });
         })->export('csv');
-        
+
     } else {
         return view('report', compact('success', 'bad', 'queue'));
     }
