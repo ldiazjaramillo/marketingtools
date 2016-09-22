@@ -15,8 +15,9 @@ class CreateImportInfosTable extends Migration
     {
         Schema::create('import_infos', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name', 255);
             $table->integer('total_row');
+            $table->string('file_name', 255);
             $table->timestamps();
         });
     }

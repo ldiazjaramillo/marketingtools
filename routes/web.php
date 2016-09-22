@@ -11,6 +11,115 @@
 |
 */
 
+use App\Jobs\PushEmailForCheckingScore;
+
 Route::get('/', function () {
     return view('welcome');
+});
+
+
+Route::post('/mapping', function (Illuminate\Http\Request $request) {
+
+    $file = $request->file('import');
+
+    $file->storeAs('/', $file->getFilename());
+
+    $excel = Maatwebsite\Excel\Facades\Excel::load($file->getRealPath())->get()->toArray();
+
+    $header = array_keys(array_shift($excel));
+    
+    $importInfo = \App\ImportInfo::create([
+        'name' => $file->getClientOriginalName(),
+        'total_row' => count($excel),
+        'file_name' => $file->getFilename()
+    ]);
+
+    return view('mapper', compact('header', 'importInfo'));
+});
+
+
+Route::post('/create_jobs', function (Illuminate\Http\Request $request){
+
+    $importInfo = \App\ImportInfo::where([
+        'id' => \Illuminate\Support\Facades\Input::get('import_id')
+    ])->first();
+
+    $path_file = 'storage/app' . '/' . $importInfo->file_name;
+
+    $excelData = Maatwebsite\Excel\Facades\Excel::load($path_file, function($reader){
+        $reader->noHeading();
+    })->get()->toArray();
+
+    $header = array_shift($excelData);
+
+    foreach ($excelData as $line){
+        $data = array_values($line);
+
+        $url = parse_url('//'.$data[\Illuminate\Support\Facades\Input::get('field_site')]);
+
+        \App\DataComparison::create([
+            'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
+            'name' => $data[\Illuminate\Support\Facades\Input::get('field_name')],
+            'site' => $url['host'],
+            'row_data' => $data,
+        ]);
+    }
+
+    $dataComparison = \App\DataComparison::where([
+        'import_id' => $importInfo->id
+    ])->get();
+
+    foreach($dataComparison as $dataItem){
+
+        if(empty($dataItem->site)){
+            $dataItem->email = false;
+            $dataItem->score = 0;
+            $dataItem->save();
+            continue;
+        }
+
+        dispatch(
+            (new PushEmailForCheckingScore([
+                'data_id' => $dataItem->id,
+                'name' => $dataItem->name,
+                'domain' => $dataItem->site
+            ]))->onQueue('data_id'.$dataItem->import_id)
+        );
+    }
+
+    return redirect('/results/'.$importInfo->id);
+});
+
+
+Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
+
+    $success = \App\DataComparison::where('email', '!=' , 0)->where(['import_id' => $id]);
+    $bad = \App\DataComparison::where(['import_id' => $id])->where('email', '=', 0);
+    $queue = \Illuminate\Support\Facades\DB::table('jobs')->where(['queue' => 'data_id'.$id]);
+
+    $type_report = \Illuminate\Support\Facades\Input::get('type');
+
+    $info = \App\ImportInfo::where(['id' => $id])->first();
+
+    if($type_report == 'bad'){
+        $bad = $bad->get();
+        return Maatwebsite\Excel\Facades\Excel::create('Bad - ' . $info->name, function($excel) use ($bad){
+            $excel->sheet('Sheetname', function($sheet) use ($bad){
+                foreach ($bad as $item){ $sheet->appendRow($item->row_data); }
+            });
+        })->export('csv');
+
+    } elseif($type_report == 'success'){
+
+        $success = $success->get();
+        return Maatwebsite\Excel\Facades\Excel::create('Success - ' . $info->name, function($excel) use ($success){
+            $excel->sheet('Sheetname', function($sheet) use ($success){
+                foreach ($success as $item){ $sheet->appendRow($item->row_data); }
+            });
+        })->export('csv');
+        
+    } else {
+        return view('report', compact('success', 'bad', 'queue'));
+    }
+
 });
