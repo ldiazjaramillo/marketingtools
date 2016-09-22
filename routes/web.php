@@ -92,9 +92,9 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
 
 Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
-    
+
     $success = \App\DataComparison::where('score', '>', 0)->where(['import_id' => $id]);
-    $bad = \App\DataComparison::where(['import_id' => $id])->where('email', '=', 0);
+    $bad = \App\DataComparison::where(['import_id' => $id])->where('email', '=', '0');
     $queue = \App\DataComparison::whereNull('score')->where(['import_id' => $id]);
 
     $type_report = \Illuminate\Support\Facades\Input::get('type');
