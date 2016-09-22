@@ -20,12 +20,12 @@ class CreateDataComparisonsTable extends Migration
             $table->foreign('import_id')->references('id')->on('import_infos');
 
             $table->string('name', 255);
-            $table->string('site', 255);
+            $table->string('site', 255)->nullable();
 
             $table->text('row_data');
 
-            $table->string('email', 255);
-            $table->float('score');
+            $table->string('email', 255)->nullable();
+            $table->float('score')->nullable();
             
             $table->timestamps();
         });
