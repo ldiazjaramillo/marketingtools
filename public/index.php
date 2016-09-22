@@ -19,6 +19,12 @@
 |
 */
 
+if (file_exists(__DIR__.'/../deploy.txt')) {
+	header('HTTP/1.1 503 Service Temporarily Unavailable');
+	echo file_get_contents( __DIR__ . '/../resources/views/errors/503.blade.php', true);
+	exit;
+}
+
 require __DIR__.'/../bootstrap/autoload.php';
 
 /*
