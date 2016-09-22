@@ -94,7 +94,7 @@
     </div>
 </div>
 <script type="text/javascript">
-    var timeout = setTimeout("location.reload(true);", 30000);
+    var timeout = setTimeout("location.reload(true);", 90000);
 </script>
 </body>
 </html>
