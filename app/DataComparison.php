@@ -26,27 +26,12 @@ class DataComparison extends Model
 
 
 		$result = [
-			$firstname,
-			$lastname,
-
-			$lastname.'.'.$firstname,
-			$lastname.$firstname,
-
-			$lastname[0].'.'.$firstname,
-			$lastname[0].$firstname,
-
-			$lastname.'.'.$firstname[0],
-			$lastname.$firstname[0],
-
-
-			$firstname.'.'.$lastname,
-			$firstname.$lastname,
-
-			$firstname[0].'.'.$lastname,
-			$firstname[0].$lastname,
-
-			$firstname.'.'.$lastname[0],
-			$firstname.$lastname[0],
+			$firstname, //alexander
+			$lastname, //gutin
+			$firstname.'.'.$lastname, //alexander.gutin
+			$lastname.'.'.$firstname,//gutin.alexander
+			$lastname.$firstname,//gutinalexander
+			$firstname[0].$lastname,//agutin
 		];
 
 		return $result;
