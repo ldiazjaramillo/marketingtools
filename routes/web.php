@@ -55,7 +55,9 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
     foreach ($excelData as $line){
         $data = array_values($line);
 
-        $url = parse_url('//'.$data[\Illuminate\Support\Facades\Input::get('field_site')]);
+        $host = str_replace(['http://', '//'], ['',''], $data[\Illuminate\Support\Facades\Input::get('field_site')]);
+
+        $url = parse_url('//'.$host);
 
         \App\DataComparison::create([
             'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
