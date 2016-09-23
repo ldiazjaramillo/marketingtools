@@ -55,7 +55,11 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
 
-            LogCallApi::create(json_encode($request));
+            $log = ['import_id' => $importInfo->import_id];
+
+            $log = array_merge($log, json_encode($request));
+            
+            LogCallApi::create($log);
 
             file_put_contents($path_file, 'Result response ' . "\r\n\r\n" . json_encode($request)."\r\n\r\n", FILE_APPEND);
 
