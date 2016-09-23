@@ -48,13 +48,14 @@ class PushEmailForCheckingScore implements ShouldQueue
             $path_file = storage_path('app/public/' . $importInfo->import_id);
 
             $email = $name.'@'.$domain;
-            
+
             file_put_contents($path_file, "\r\n".'https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'."\r\n", FILE_APPEND);
 
             $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
 
             $log = ['import_id' => $importInfo->import_id];
 
+            $request['score'] = $request['score']*100;
             LogCallApi::create(array_merge($log, $request));
 
             file_put_contents($path_file, 'Result response ' . "\r\n\r\n" . json_encode($request)."\r\n\r\n", FILE_APPEND);
@@ -63,7 +64,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                 Log::warning('Invalid email ' . $email);
                 continue;
             } else {
-                $score = $request['score']*100;
+                $score = $request['score'];
 
                 Log::info('Get score for '.$email . ' ' . $score);
 
