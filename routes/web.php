@@ -22,7 +22,7 @@ Route::post('/mapping', function (Illuminate\Http\Request $request) {
 
     $file = $request->file('import');
 
-    $file->storeAs('/', $file->getFilename());
+    $file->storeAs('/public/', $file->getFilename());
 
     $excel = Maatwebsite\Excel\Facades\Excel::load($file->getRealPath())->get()->toArray();
 
