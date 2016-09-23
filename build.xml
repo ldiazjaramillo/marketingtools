@@ -20,7 +20,7 @@
     <target name="build-parallel-clean"
             depends="clean,build-common,tools-parallel" />
 
-    <target name="build-common" depends="lint,prepare,storage-permissions,composer,migrate,storage-permissions" />
+    <target name="build-common" depends="lint,prepare,storage-permissions,composer,migrate,storage-permissions,storage-symlink" />
 
     <target name="tools-parallel" description="Run tools in parallel">
         <parallel threadCount="2">
@@ -199,6 +199,13 @@
         </exec>
     </target>
 
+    <target name="storage-symlink" description="Create symlink to storage">
+        <echo>Create symlink to storage</echo>
+        <exec executable="php" failonerror="true">
+            <arg value="artisan" />
+            <arg value="storage:link" />
+        </exec>
+    </target>
 
     <!--// Check to see it the app/storage folder exist, if so, then can change permissions //-->
     <target name="storage.windows.check" description="Check for app/storage on windows">
