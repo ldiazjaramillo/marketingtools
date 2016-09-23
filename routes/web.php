@@ -44,7 +44,7 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
         'id' => \Illuminate\Support\Facades\Input::get('import_id')
     ])->first();
 
-    $path_file = 'storage/app' . '/' . $importInfo->file_name;
+    $path_file = 'storage/app/public/' . $importInfo->file_name;
 
     $excelData = Maatwebsite\Excel\Facades\Excel::load($path_file, function($reader){
         $reader->noHeading();

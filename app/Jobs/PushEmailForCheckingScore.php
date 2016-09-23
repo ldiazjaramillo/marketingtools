@@ -43,13 +43,17 @@ class PushEmailForCheckingScore implements ShouldQueue
 
         foreach($variableName as $name){
 
+            $importInfo = DataComparison::where(['id' => $data_id])->first();
+            $path_file = storage_path('app/public/' . $importInfo->import_id);
+
             $email = $name.'@'.$domain;
 
-            Log::info('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1');
+            file_put_contents($path_file, 'https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1');
 
             $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
+            
+            file_put_contents($path_file, 'Result response ' . "\r\n" . json_encode($request));
 
-            Log::info('Result response ' . json_encode($request));
 
             if(!$request['format_valid']){
                 Log::warning('Invalid email ' . $email);
