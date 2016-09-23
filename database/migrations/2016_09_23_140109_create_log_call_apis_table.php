@@ -31,7 +31,7 @@ class CreateLogCallApisTable extends Migration
             $table->boolean('role');
             $table->boolean('disposable');
             $table->boolean('free');
-            $table->integer('score');
+            $table->float('score');
 
             $table->timestamps();
         });
