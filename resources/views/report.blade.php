@@ -89,6 +89,11 @@
                         <h2>{{$queue->count()}}</h2>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="3">
+                        <a href="/storage/{{$id}}" target="_blank">API log</a>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>

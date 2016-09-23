@@ -129,7 +129,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
         })->export('csv');
 
     } else {
-        return view('report', compact('success', 'bad', 'queue'));
+        return view('report', compact('success', 'bad', 'queue', 'id'));
     }
 
 });
