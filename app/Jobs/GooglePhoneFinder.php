@@ -44,9 +44,17 @@ class GooglePhoneFinder implements ShouldQueue
 
             $googleUrl->setSearchTerm($this->data['company_name'] . ' phone');
 
+
+            if(env('APP_ENV') == 'production'){
+                $proxy = new Proxy('37.48.118.90', '13012');
+                $response = $googleClient->query($googleUrl, $proxy);
+            } else {
+                $response = $googleClient->query($googleUrl);
+            }
+
             //$proxy = new Proxy('72.252.14.163', '8080');
             //$response = $googleClient->query($googleUrl, $proxy);
-            $response = $googleClient->query($googleUrl);
+            //$response = $googleClient->query($googleUrl);
 
             $blockWithPhone = $response->cssQuery('._RCm');
 
