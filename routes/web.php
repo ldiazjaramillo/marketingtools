@@ -80,7 +80,7 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
         }
 
     }
-    
+
     return redirect('/results/'.$importInfo->id);
 });
 
@@ -111,6 +111,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
                         foreach ($bad as $item){
                             $array = (array) $item->row_data;
                             $array[] = $item->email;
+                            $array[] = $item->phone;
                             $array[] = $item->score;
                             $sheet->appendRow($array);
                         }
@@ -147,6 +148,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
                         foreach ($success as $item){
                             $array = (array) $item->row_data;
                             $array[] = $item->email;
+                            $array[] = $item->phone;
                             $array[] = $item->score;
                             $sheet->appendRow($array);
                         }
