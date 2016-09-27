@@ -20,10 +20,7 @@ class CreateGoogleCheckEmailsTable extends Migration
             $table->foreign('import_id')->references('id')->on('import_infos');
 
             $table->text('email');
-
-            $table->integer('data_comparasion_id')->unsigned();
-            $table->foreign('data_comparasion_id')->references('id')->on('data_comparisons');
-
+            
             $table->integer('count_results')->nullable();
 
             $table->timestamps();

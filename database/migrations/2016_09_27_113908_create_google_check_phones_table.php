@@ -22,10 +22,7 @@ class CreateGoogleCheckPhonesTable extends Migration
             $table->text('site');
             $table->text('company_name');
             $table->text('phone')->nullable();
-
-            $table->integer('data_comparasion_id')->unsigned();
-            $table->foreign('data_comparasion_id')->references('id')->on('data_comparisons');
-
+            
             $table->timestamps();
         });
     }
