@@ -70,6 +70,7 @@
             Report
         </div>
         <div class="links">
+
             <table width="100%">
                 <tr>
                     <td>Success <br/>email</td>
@@ -79,11 +80,11 @@
                 <tr>
                     <td>
                         <h2>{{$success->count()}}</h2>
-                        <a href="?type=success" target="_blank">download</a>
+                        <a href="?type=success&data_source=email" target="_blank">download</a>
                     </td>
                     <td>
                         <h2>{{$bad->count()}}</h2>
-                        <a href="?type=bad" target="_blank">download</a>
+                        <a href="?type=bad&data_source=email" target="_blank">download</a>
                     </td>
                     <td>
                         <h2>{{$queue->count()}}</h2>
@@ -92,6 +93,34 @@
                 <tr>
                     <td colspan="3">
                         <a href="/storage/{{$id}}" target="_blank">API log</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <br/>
+        <div class="title m-b-md" style="font-size: 24px;">
+            Detected phone for company
+        </div>
+        <div class="links">
+
+            <table width="100%">
+                <tr>
+                    <td>Success</td>
+                    <td>Bad</td>
+                    <td>In queue</td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>{{$phoneSuccess->count()}}</h2>
+                        <a href="?type=success&data_source=phone_company" target="_blank">download</a>
+                    </td>
+                    <td>
+                        <h2>{{$phoneBad->count()}}</h2>
+                        <a href="?type=bad&data_source=phone_company" target="_blank">download</a>
+                    </td>
+                    <td>
+                        <h2>{{$phoneQueue->count()}}</h2>
                     </td>
                 </tr>
             </table>

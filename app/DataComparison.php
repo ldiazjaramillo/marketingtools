@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Jobs\PushEmailForCheckingScore;
 use Illuminate\Database\Eloquent\Model;
 
 class DataComparison extends Model
@@ -37,4 +38,28 @@ class DataComparison extends Model
 
 		return $result;
 	}
+
+	public static function boot()
+	{
+		parent::boot();
+		static::created(function ($model) {
+
+			if(empty($model->site)){
+				$model->email = false;
+				$model->score = 0;
+				$model->save();
+			} else {
+				dispatch(
+					(new PushEmailForCheckingScore([
+						'data_id' => $model->id,
+						'name' => $model->name,
+						'domain' => $model->site
+					]))->onQueue('default')
+				);
+			}
+
+		});
+	}
+
+
 }

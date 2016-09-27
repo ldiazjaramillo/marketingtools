@@ -11,6 +11,7 @@
 |
 */
 
+use App\GoogleCheckPhone;
 use App\Jobs\PushEmailForCheckingScore;
 
 Route::get('/', function () {
@@ -59,37 +60,27 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
         $url = parse_url('//'.$host);
 
-        \App\DataComparison::create([
+        $company_name = $data[\Illuminate\Support\Facades\Input::get('field_company_name')];
+
+        $dataItem = \App\DataComparison::create([
             'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
             'name' => $data[\Illuminate\Support\Facades\Input::get('field_name')],
-            'company_name' => $data[\Illuminate\Support\Facades\Input::get('field_company_name')],
+            'company_name' => $company_name,
             'site' => $url['host'],
             'row_data' => $data,
         ]);
-    }
 
-    $dataComparison = \App\DataComparison::where([
-        'import_id' => $importInfo->id
-    ])->get();
-
-    foreach($dataComparison as $dataItem){
-
-        if(empty($dataItem->site)){
-            $dataItem->email = false;
-            $dataItem->score = 0;
-            $dataItem->save();
-            continue;
+        if(!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0){
+            GoogleCheckPhone::create([
+                'import_id' => $dataItem->import_id,
+                'site' => (empty($url['host'])? '' : $url['host']),
+                'company_name' => $company_name,
+                'data_comparasion_id' => $dataItem->id
+            ]);
         }
 
-        dispatch(
-            (new PushEmailForCheckingScore([
-                'data_id' => $dataItem->id,
-                'name' => $dataItem->name,
-                'domain' => $dataItem->site
-            ]))->onQueue('default')
-        );
     }
-
+    
     return redirect('/results/'.$importInfo->id);
 });
 
@@ -100,39 +91,87 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
     $bad = \App\DataComparison::where(['import_id' => $id])->where('email', '=', '0');
     $queue = \App\DataComparison::whereNull('score')->where(['import_id' => $id]);
 
+    $phoneSuccess = \App\GoogleCheckPhone::where('phone', '>', '0')->where(['import_id' => $id]);
+    $phoneBad = \App\GoogleCheckPhone::where(['import_id' => $id])->where('phone', '=', '0');
+    $phoneQueue = \App\GoogleCheckPhone::whereNull('phone')->where(['import_id' => $id]);
+
     $type_report = \Illuminate\Support\Facades\Input::get('type');
+    $data_source = \Illuminate\Support\Facades\Input::get('data_source');
 
     $info = \App\ImportInfo::where(['id' => $id])->first();
 
     if($type_report == 'bad'){
-        $bad = $bad->get();
-        return Maatwebsite\Excel\Facades\Excel::create('Bad - ' . $info->name, function($excel) use ($bad){
-            $excel->sheet('Sheetname', function($sheet) use ($bad){
-                foreach ($bad as $item){
-                    $array = (array) $item->row_data;
-                    $array[] = $item->email;
-                    $array[] = $item->score;
-                    $sheet->appendRow($array);
-                }
-            });
-        })->export('csv');
+
+
+        switch ($data_source){
+            case 'email':
+                $bad = $bad->get();
+                return Maatwebsite\Excel\Facades\Excel::create('Bad - ' . $info->name, function($excel) use ($bad){
+                    $excel->sheet('Sheetname', function($sheet) use ($bad){
+                        foreach ($bad as $item){
+                            $array = (array) $item->row_data;
+                            $array[] = $item->email;
+                            $array[] = $item->score;
+                            $sheet->appendRow($array);
+                        }
+                    });
+                })->export('csv');
+                break;
+            case 'phone_company':
+
+                $phoneBad = $phoneBad->get();
+                return Maatwebsite\Excel\Facades\Excel::create('Bad - company phone ' . $info->name, function($excel) use ($phoneBad){
+                    $excel->sheet('Sheetname', function($sheet) use ($phoneBad){
+                        foreach ($phoneBad as $item){
+                            $array = (array) $item->row_data;
+                            $array[] = $item->site;
+                            $array[] = $item->company_name;
+                            $array[] = $item->phone;
+                            $sheet->appendRow($array);
+                        }
+                    });
+                })->export('csv');
+
+                break;
+        }
 
     } elseif($type_report == 'success'){
 
-        $success = $success->get();
-        return Maatwebsite\Excel\Facades\Excel::create('Success - ' . $info->name, function($excel) use ($success){
-            $excel->sheet('Sheetname', function($sheet) use ($success){
-                foreach ($success as $item){
-                    $array = (array) $item->row_data;
-                    $array[] = $item->email;
-                    $array[] = $item->score;
-                    $sheet->appendRow($array);
-                }
-            });
-        })->export('csv');
+
+
+        switch ($data_source) {
+            case 'email':
+                $success = $success->get();
+                return Maatwebsite\Excel\Facades\Excel::create('Success - ' . $info->name, function($excel) use ($success){
+                    $excel->sheet('Sheetname', function($sheet) use ($success){
+                        foreach ($success as $item){
+                            $array = (array) $item->row_data;
+                            $array[] = $item->email;
+                            $array[] = $item->score;
+                            $sheet->appendRow($array);
+                        }
+                    });
+                })->export('csv');
+                break;
+            case 'phone_company':
+                $phoneSuccess = $phoneSuccess->get();
+                return Maatwebsite\Excel\Facades\Excel::create('Success - company phone ' . $info->name, function($excel) use ($phoneSuccess){
+                    $excel->sheet('Sheetname', function($sheet) use ($phoneSuccess){
+                        foreach ($phoneSuccess as $item){
+                            $array = (array) $item->row_data;
+                            $array[] = $item->site;
+                            $array[] = $item->company_name;
+                            $array[] = $item->phone;
+                            $sheet->appendRow($array);
+                        }
+                    });
+                })->export('csv');
+
+                break;
+        }
 
     } else {
-        return view('report', compact('success', 'bad', 'queue', 'id'));
+        return view('report', compact('success', 'bad', 'queue', 'id', 'phoneSuccess', 'phoneBad', 'phoneQueue'));
     }
 
 });
