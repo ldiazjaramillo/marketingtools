@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Log;
 
 class GooglePhoneFinder implements ShouldQueue
 {
@@ -43,14 +44,9 @@ class GooglePhoneFinder implements ShouldQueue
             $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
 
             $googleUrl->setSearchTerm($this->data['company_name'] . ' phone number');
-
-
-            if(env('APP_ENV') == 'production'){
-                $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
-                $response = $googleClient->query($googleUrl, $proxy);
-            } else {
-                $response = $googleClient->query($googleUrl);
-            }
+            
+			$proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
+			$response = $googleClient->query($googleUrl, $proxy);
 
             $blockWithPhone = $response->cssQuery('._RCm');
 
@@ -61,7 +57,7 @@ class GooglePhoneFinder implements ShouldQueue
             } else {
                 $number = 0;
             }
-            var_dump($number);
+
 
         } catch (\Exception $e){
             Log::warning('Error google phone finder for ' .  $this->data['id'] . ' ' . $this->data['company_name'] . '. '.$e->getMessage());
