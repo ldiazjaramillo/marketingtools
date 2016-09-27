@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\DataComparison;
+use App\GoogleCheckEmail;
 use App\LogCallApi;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -53,7 +54,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
 
-            $log = ['import_id' => $importInfo->import_id];
+            $log = ['import_id' => $importInfo->import_id, 'data_comparasion_id' => $importInfo->id];
 
             $request['score'] = $request['score']*100;
             LogCallApi::create(array_merge($log, $request));
@@ -98,7 +99,18 @@ class PushEmailForCheckingScore implements ShouldQueue
                     'email' => false
                 ]);
 
-                return true;
+                //Create queue for checking google email
+                $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name);
+
+                foreach($allVariantEmail as $nameForBadEmail){
+                    GoogleCheckEmail::create([
+                        'import_id' => $importInfo->import_id,
+                        'email' => $nameForBadEmail.'@'.$domain,
+                        'data_comparasion_id' => $data_id
+                    ]);
+                }
+
+                return false;
             }
 
         }

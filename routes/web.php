@@ -62,6 +62,7 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
         \App\DataComparison::create([
             'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
             'name' => $data[\Illuminate\Support\Facades\Input::get('field_name')],
+            'company_name' => $data[\Illuminate\Support\Facades\Input::get('field_company_name')],
             'site' => $url['host'],
             'row_data' => $data,
         ]);

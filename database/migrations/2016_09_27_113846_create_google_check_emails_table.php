@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDataComparisonsTable extends Migration
+class CreateGoogleCheckEmailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,19 @@ class CreateDataComparisonsTable extends Migration
      */
     public function up()
     {
-        Schema::create('data_comparisons', function (Blueprint $table) {
+        Schema::create('google_check_emails', function (Blueprint $table) {
             $table->increments('id');
 
             $table->integer('import_id')->unsigned();
             $table->foreign('import_id')->references('id')->on('import_infos');
 
-            $table->string('name', 255);
-            $table->string('company_name', 255);
-            $table->string('site', 255)->nullable();
+            $table->text('email');
 
-            $table->text('row_data');
+            $table->integer('data_comparasion_id')->unsigned();
+            $table->foreign('data_comparasion_id')->references('id')->on('data_comparisons');
 
-            $table->string('email', 255)->nullable();
-            $table->float('score')->nullable();
-            
+            $table->integer('count_results')->nullable();
+
             $table->timestamps();
         });
     }
@@ -39,6 +37,6 @@ class CreateDataComparisonsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('data_comparisons');
+        Schema::dropIfExists('google_check_emails');
     }
 }

@@ -94,6 +94,15 @@
                     @endforeach
                 </select>
 
+                <select name="field_company_name">
+                    <option value="" disabled selected>Please select column with company name</option>
+                    @foreach($header as $key => $item)
+                        @if(!empty($item))
+                            <option value="{{$key}}">{{$item}}</option>
+                        @endif
+                    @endforeach
+                </select>
+
                 <input type="submit" id="submit" value="Start"/>
             </form>
         </div>

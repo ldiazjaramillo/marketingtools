@@ -19,7 +19,8 @@ class LogCallApi extends Model
 		'role',
 		'disposable',
 		'free',
-		'score'
+		'score',
+		'data_comparasion_id'
 	];
 
 }

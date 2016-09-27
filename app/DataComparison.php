@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DataComparison extends Model
 {
-    protected $fillable = ['import_id', 'name', 'row_data', 'site'];
+    protected $fillable = ['import_id', 'name', 'row_data', 'site', 'company_name'];
 
 	protected $casts = [
 		'row_data' => 'json',
