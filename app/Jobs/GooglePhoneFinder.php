@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\DataComparison;
 use App\GoogleCheckPhone;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -61,6 +62,8 @@ class GooglePhoneFinder implements ShouldQueue
         $checkFone = GoogleCheckPhone::where(['id' => $this->data['id']])->first();
         $checkFone->phone = $number;
         $checkFone->save();
+
+        DataComparison::where(['site' => $checkFone->site])->update(['phone' => $number]);
 
     }
 }
