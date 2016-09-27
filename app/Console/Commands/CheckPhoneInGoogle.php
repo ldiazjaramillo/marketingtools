@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Serps\Core\Http\Proxy;
 
 class CheckPhoneInGoogle extends Command
 {
