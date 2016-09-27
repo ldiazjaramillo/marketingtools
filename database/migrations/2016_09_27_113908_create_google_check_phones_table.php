@@ -20,9 +20,9 @@ class CreateGoogleCheckPhonesTable extends Migration
             $table->foreign('import_id')->references('id')->on('import_infos');
 
             $table->text('site');
-            $table->text('company_name');
+            $table->text('company_name')->nullable();
             $table->text('phone')->nullable();
-            
+
             $table->timestamps();
         });
     }
