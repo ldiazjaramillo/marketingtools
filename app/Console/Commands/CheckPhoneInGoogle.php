@@ -57,13 +57,11 @@ class CheckPhoneInGoogle extends Command
         $blockWithPhone = $response->cssQuery('._RCm');
 
         if(!empty($blockWithPhone->length)){
-
-            $this->info('block with phone empty');
-
             $str = $response->cssQuery('._RCm')->item(0)->parentNode->textContent;
             preg_match_all('!\d+!', $str, $matches);
             $number = implode('', $matches[0]);
         } else {
+            $this->info('block with phone empty');
             $number = 0;
         }
 
