@@ -74,7 +74,7 @@
             <table width="100%">
                 <tr>
                     <td>Success <br/>email</td>
-                    <td>Bad <br/>email</td>
+                    <td>Bad <br/>contacts</td>
                     <td>In queue</td>
                     <td>Google <br/> checker</td>
                 </tr>
