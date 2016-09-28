@@ -1,47 +1,40 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Jobs;
 
-use Illuminate\Console\Command;
-use Serps\Core\Http\Proxy;
+use App\DataComparison;
+use App\GoogleCheckEmail;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class CheckEmailInGoogle extends Command
+class GoogleEmailChecker implements ShouldQueue
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'check:emailInGoogle {email}';
+    use InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $data = [];
 
     /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Check email in Google';
-
-    /**
-     * Create a new command instance.
+     * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(array $data)
     {
-        parent::__construct();
+        $this->data = $data;
     }
 
     /**
-     * Execute the console command.
+     * Execute the job.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
-
-        $email = $this->argument('email');
-
         $googleClient = new \Serps\SearchEngine\Google\GoogleClient(new \Serps\HttpClient\CurlClient());
+
+        $email = $this->data['email'];
 
         // Tell the client to use a user agent
         $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
@@ -53,20 +46,19 @@ class CheckEmailInGoogle extends Command
         $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
         $response = $googleClient->query($googleUrl, $proxy);
 
-        $resultObject = $response->getDom()->getElementById('resultStats');//->textContent;
-
-        $isSuggestionResult = $response->cssQuery('.ct-cs .med')->length;//
+        $resultObject = $response->getDom()->getElementById('resultStats');
 
         $count_result = 0;
 
-        if(!is_null($resultObject) && $isSuggestionResult == false){
+        if(!is_null($resultObject)){
             $result_string = $resultObject->textContent;
-            $this->info($result_string);
             $result_string = str_replace([' ', ' '], ['', ''], $result_string);
             preg_match("/[0-9,]+/", $result_string, $result);
             $count_result = (int) $result[0];
         }
-        $this->info($count_result);
-        die;
+
+        GoogleCheckEmail::where(['id' => $this->data['id']])->update(['count_results' => $count_result]);
+
+        DataComparison::where(['id' => $this->data['']])->update(['email' => $email, 'score' => 99.99]);
     }
 }
