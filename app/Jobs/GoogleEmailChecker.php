@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Serps\Core\Http\Proxy;
 
 class GoogleEmailChecker implements ShouldQueue
 {
@@ -48,9 +49,11 @@ class GoogleEmailChecker implements ShouldQueue
 
         $resultObject = $response->getDom()->getElementById('resultStats');
 
+        $isSuggestionResult = $response->cssQuery('.ct-cs .med')->length;
+
         $count_result = 0;
 
-        if(!is_null($resultObject)){
+        if(!is_null($resultObject) && $isSuggestionResult == false){
             $result_string = $resultObject->textContent;
             $result_string = str_replace([' ', ' '], ['', ''], $result_string);
             preg_match("/[0-9,]+/", $result_string, $result);
@@ -59,6 +62,8 @@ class GoogleEmailChecker implements ShouldQueue
 
         GoogleCheckEmail::where(['id' => $this->data['id']])->update(['count_results' => $count_result]);
 
-        DataComparison::where(['id' => $this->data['']])->update(['email' => $email, 'score' => 99.99]);
+        if($count_result > 0){
+            DataComparison::where(['id' => $this->data['data_comparasion_id']])->update(['email' => $email, 'score' => 99.99]);
+        }
     }
 }

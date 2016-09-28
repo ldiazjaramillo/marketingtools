@@ -76,6 +76,7 @@
                     <td>Success <br/>email</td>
                     <td>Bad <br/>email</td>
                     <td>In queue</td>
+                    <td>Google <br/> checker</td>
                 </tr>
                 <tr>
                     <td>
@@ -89,9 +90,12 @@
                     <td>
                         <h2>{{$queue->count()}}</h2>
                     </td>
+                    <td>
+                        <h2>{{$checkEmailInGoogle->count()}}</h2>
+                    </td>
                 </tr>
                 <tr>
-                    <td colspan="3">
+                    <td colspan="4">
                         <a href="/storage/{{$id}}" target="_blank">API log</a>
                     </td>
                 </tr>

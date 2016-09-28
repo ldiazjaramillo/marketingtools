@@ -13,6 +13,7 @@
 
 use App\GoogleCheckPhone;
 use App\Jobs\PushEmailForCheckingScore;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () {
     return view('welcome');
@@ -87,8 +88,14 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
 Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 
+    $checkEmailInGoogle = \App\GoogleCheckEmail::where(['import_id' => $id])->whereNull('count_results')->get()->pluck('email','data_comparasion_id');
+
     $success = \App\DataComparison::where('score', '>', 0)->where(['import_id' => $id]);
-    $bad = \App\DataComparison::where(['import_id' => $id])->where('email', '=', '0');
+
+    $bad = \App\DataComparison::where(['import_id' => $id])
+        ->whereNotIn('id', array_keys($checkEmailInGoogle->toArray()))
+        ->where('email', '=', '0');
+
     $queue = \App\DataComparison::whereNull('score')->where(['import_id' => $id]);
 
     $phoneSuccess = \App\GoogleCheckPhone::where('phone', '>', '0')->where(['import_id' => $id]);
@@ -173,7 +180,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
         }
 
     } else {
-        return view('report', compact('success', 'bad', 'queue', 'id', 'phoneSuccess', 'phoneBad', 'phoneQueue'));
+        return view('report', compact('success', 'bad', 'queue', 'id', 'phoneSuccess', 'phoneBad', 'phoneQueue', 'checkEmailInGoogle'));
     }
 
 });
