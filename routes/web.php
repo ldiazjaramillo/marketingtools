@@ -14,6 +14,7 @@
 use App\GoogleCheckPhone;
 use App\Jobs\PushEmailForCheckingScore;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,7 +36,6 @@ Route::post('/mapping', function (Illuminate\Http\Request $request) {
         'total_row' => count($excel),
         'file_name' => $file->getFilename()
     ]);
-
 
 
     if($request->get('phone')) {
@@ -60,34 +60,14 @@ Route::post('/detected_phone', function (){
         $reader->noHeading();
     })->get()->toArray();
 
+
     $header = array_shift($excelData);
 
-    foreach ($excelData as $line){
-        $data = array_values($line);
-
-        $host = str_replace(['http://', '//', 'www.'], ['','', ''], strtolower($data[\Illuminate\Support\Facades\Input::get('field_site')]));
-
-        $url = parse_url('//'.$host);
-
-        $company_name = $data[\Illuminate\Support\Facades\Input::get('field_company_name')];
-
-        $dataItem = \App\DataComparison::create([
-            'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
-            'name' => $data[\Illuminate\Support\Facades\Input::get('field_name')],
-            'company_name' => $company_name,
-            'site' => $url['host'],
-            'row_data' => $data,
-        ]);
-
-        if(!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0){
-            GoogleCheckPhone::create([
-                'import_id' => $dataItem->import_id,
-                'site' => (empty($url['host'])? '' : $url['host']),
-                'company_name' => $company_name,
-                'data_comparasion_id' => $dataItem->id
-            ]);
-        }
-
+    foreach(array_chunk($excelData, 200) as $arrayData){
+        dispatch((new \App\Jobs\ImportFileInBackground([
+            'data' => $arrayData,
+            'input' => \Illuminate\Support\Facades\Input::get(),
+        ]))->onQueue('import_file'));
     }
 
     return redirect('/results/phone/'.$importInfo->id);
@@ -108,32 +88,11 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
     $header = array_shift($excelData);
 
-    foreach ($excelData as $line){
-        $data = array_values($line);
-
-        $host = str_replace(['http://', '//', 'www.'], ['','', ''], strtolower($data[\Illuminate\Support\Facades\Input::get('field_site')]));
-
-        $url = parse_url('//'.$host);
-
-        $company_name = $data[\Illuminate\Support\Facades\Input::get('field_company_name')];
-
-        $dataItem = \App\DataComparison::create([
-            'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
-            'name' => $data[\Illuminate\Support\Facades\Input::get('field_name')],
-            'company_name' => $company_name,
-            'site' => $url['host'],
-            'row_data' => $data,
-        ]);
-
-        if(!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0){
-            GoogleCheckPhone::create([
-                'import_id' => $dataItem->import_id,
-                'site' => (empty($url['host'])? '' : $url['host']),
-                'company_name' => $company_name,
-                'data_comparasion_id' => $dataItem->id
-            ]);
-        }
-
+    foreach(array_chunk($excelData, 200) as $arrayData){
+        dispatch((new \App\Jobs\ImportFileInBackground([
+            'data' => $arrayData,
+            'input' => \Illuminate\Support\Facades\Input::get(),
+        ]))->onQueue('import_file'));
     }
 
     return redirect('/results/'.$importInfo->id);
@@ -272,7 +231,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 
                             $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
                             $array = (array) $fullData->row_data;
-                            
+
                             $array[] = $item->phone;
                             $sheet->appendRow($array);
                         }
