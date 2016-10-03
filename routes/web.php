@@ -36,9 +36,58 @@ Route::post('/mapping', function (Illuminate\Http\Request $request) {
         'file_name' => $file->getFilename()
     ]);
 
-    return view('mapper', compact('header', 'importInfo'));
+
+
+    if($request->get('phone')) {
+        $url = '/detected_phone';
+    } else {
+        $url = '/create_jobs';
+    }
+
+    return view('mapper', compact('header', 'importInfo', 'url'));
 });
 
+
+Route::post('/detected_phone', function (){
+
+    $importInfo = \App\ImportInfo::where([
+        'id' => \Illuminate\Support\Facades\Input::get('import_id')
+    ])->first();
+
+    $path_file = 'storage/app/public/' . $importInfo->file_name;
+
+    $excelData = Maatwebsite\Excel\Facades\Excel::load($path_file, function($reader){
+        $reader->noHeading();
+    })->get()->toArray();
+
+    $header = array_shift($excelData);
+
+    foreach ($excelData as $line){
+        $data = array_values($line);
+
+        $host = str_replace(['http://', '//', 'www.'], ['','', ''], strtolower($data[\Illuminate\Support\Facades\Input::get('field_site')]));
+
+        $url = parse_url('//'.$host);
+
+        $company_name = $data[\Illuminate\Support\Facades\Input::get('field_company_name')];
+
+
+        if(!empty($company_name) && GoogleCheckPhone::where([
+                'company_name' => $company_name,
+                'import_id' => \Illuminate\Support\Facades\Input::get('import_id')]
+            )->count() == 0){
+            GoogleCheckPhone::create([
+                'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
+                'site' => (empty($url['host'])? '' : $url['host']),
+                'company_name' => $company_name
+            ]);
+        }
+
+    }
+
+    return redirect('/results/phone/'.$importInfo->id);
+
+});
 
 Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
@@ -85,6 +134,52 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
     return redirect('/results/'.$importInfo->id);
 });
 
+Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $id){
+
+    $phoneSuccess = \App\GoogleCheckPhone::where('phone', '>', '0')->where(['import_id' => $id]);
+    $phoneBad = \App\GoogleCheckPhone::where(['import_id' => $id])->where('phone', '=', '0');
+    $phoneQueue = \App\GoogleCheckPhone::whereNull('phone')->where(['import_id' => $id]);
+
+    $type_report = \Illuminate\Support\Facades\Input::get('type');
+    $data_source = \Illuminate\Support\Facades\Input::get('data_source');
+
+    $info = \App\ImportInfo::where(['id' => $id])->first();
+
+    if($type_report == 'bad'){
+
+        $phoneBad = $phoneBad->get();
+        return Maatwebsite\Excel\Facades\Excel::create('Bad - company phone ' . $info->name, function($excel) use ($phoneBad){
+            $excel->sheet('Sheetname', function($sheet) use ($phoneBad){
+                foreach ($phoneBad as $item){
+                    $array = (array) $item->row_data;
+                    $array[] = $item->site;
+                    $array[] = $item->company_name;
+                    $array[] = $item->phone;
+                    $sheet->appendRow($array);
+                }
+            });
+        })->export('csv');
+
+    } elseif($type_report == 'success'){
+        
+        $phoneSuccess = $phoneSuccess->get();
+        return Maatwebsite\Excel\Facades\Excel::create('Success - company phone ' . $info->name, function($excel) use ($phoneSuccess){
+            $excel->sheet('Sheetname', function($sheet) use ($phoneSuccess){
+                foreach ($phoneSuccess as $item){
+                    $array = (array) $item->row_data;
+                    $array[] = $item->site;
+                    $array[] = $item->company_name;
+                    $array[] = $item->phone;
+                    $sheet->appendRow($array);
+                }
+            });
+        })->export('csv');
+
+    } else {
+        return view('report_phone', compact('id', 'phoneSuccess', 'phoneBad', 'phoneQueue'));
+    }
+
+});
 
 Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 

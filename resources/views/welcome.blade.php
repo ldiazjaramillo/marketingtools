@@ -45,7 +45,7 @@
             }
 
             .title {
-                font-size: 84px;
+                font-size: 44px;
             }
 
             .links > a {
@@ -66,18 +66,36 @@
     <body>
         <div class="flex-center position-ref full-height">
             <div class="content">
-                <div class="title m-b-md">
-                    Email checker
-                </div>
+                <table>
+                    <tr>
+                        <td>
+                            <div class="title m-b-md">Email checker</div>
 
-                <div class="links">
-                    <form class="form-horizontal" role="form" method="POST" action="/mapping" enctype="multipart/form-data">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <div class="links">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping" enctype="multipart/form-data">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
+                                </form>
+                            </div>
+                        </td>
+                        <td width="100px"></td>
+                        <td>
+                            <div class="title m-b-md">Find phone</div>
 
-                        <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
-                        <input type="submit" id="submit" value="Submit"/>
-                    </form>
-                </div>
+                            <div class="links">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping" enctype="multipart/form-data">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="phone" value="true">
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+
             </div>
         </div>
     </body>

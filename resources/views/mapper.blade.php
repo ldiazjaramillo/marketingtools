@@ -72,7 +72,7 @@
 
         <div class="links">
 
-            <form class="form-horizontal" role="form" method="POST" action="/create_jobs" enctype="multipart/form-data">
+            <form class="form-horizontal" role="form" method="POST" action="{{$url}}" enctype="multipart/form-data">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="import_id" value="{{ $importInfo->id }}">
 
