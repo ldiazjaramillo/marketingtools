@@ -71,15 +71,20 @@ Route::post('/detected_phone', function (){
 
         $company_name = $data[\Illuminate\Support\Facades\Input::get('field_company_name')];
 
+        $dataItem = \App\DataComparison::create([
+            'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
+            'name' => $data[\Illuminate\Support\Facades\Input::get('field_name')],
+            'company_name' => $company_name,
+            'site' => $url['host'],
+            'row_data' => $data,
+        ]);
 
-        if(!empty($company_name) && GoogleCheckPhone::where([
-                'company_name' => $company_name,
-                'import_id' => \Illuminate\Support\Facades\Input::get('import_id')]
-            )->count() == 0){
+        if(!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0){
             GoogleCheckPhone::create([
-                'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
+                'import_id' => $dataItem->import_id,
                 'site' => (empty($url['host'])? '' : $url['host']),
-                'company_name' => $company_name
+                'company_name' => $company_name,
+                'data_comparasion_id' => $dataItem->id
             ]);
         }
 
@@ -151,9 +156,10 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
         return Maatwebsite\Excel\Facades\Excel::create('Bad - company phone ' . $info->name, function($excel) use ($phoneBad){
             $excel->sheet('Sheetname', function($sheet) use ($phoneBad){
                 foreach ($phoneBad as $item){
-                    $array = (array) $item->row_data;
-                    $array[] = $item->site;
-                    $array[] = $item->company_name;
+
+                    $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
+                    $array = (array) $fullData->row_data;
+
                     $array[] = $item->phone;
                     $sheet->appendRow($array);
                 }
@@ -161,14 +167,15 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
         })->export('csv');
 
     } elseif($type_report == 'success'){
-        
+
         $phoneSuccess = $phoneSuccess->get();
         return Maatwebsite\Excel\Facades\Excel::create('Success - company phone ' . $info->name, function($excel) use ($phoneSuccess){
             $excel->sheet('Sheetname', function($sheet) use ($phoneSuccess){
                 foreach ($phoneSuccess as $item){
-                    $array = (array) $item->row_data;
-                    $array[] = $item->site;
-                    $array[] = $item->company_name;
+
+                    $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
+                    $array = (array) $fullData->row_data;
+
                     $array[] = $item->phone;
                     $sheet->appendRow($array);
                 }
@@ -212,6 +219,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
                     $excel->sheet('Sheetname', function($sheet) use ($bad){
                         foreach ($bad as $item){
                             $array = (array) $item->row_data;
+
                             $array[] = $item->email;
                             $array[] = $item->phone;
                             $array[] = $item->score;
@@ -226,9 +234,10 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
                 return Maatwebsite\Excel\Facades\Excel::create('Bad - company phone ' . $info->name, function($excel) use ($phoneBad){
                     $excel->sheet('Sheetname', function($sheet) use ($phoneBad){
                         foreach ($phoneBad as $item){
-                            $array = (array) $item->row_data;
-                            $array[] = $item->site;
-                            $array[] = $item->company_name;
+
+                            $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
+                            $array = (array) $fullData->row_data;
+
                             $array[] = $item->phone;
                             $sheet->appendRow($array);
                         }
@@ -239,8 +248,6 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
         }
 
     } elseif($type_report == 'success'){
-
-
 
         switch ($data_source) {
             case 'email':
@@ -262,9 +269,10 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
                 return Maatwebsite\Excel\Facades\Excel::create('Success - company phone ' . $info->name, function($excel) use ($phoneSuccess){
                     $excel->sheet('Sheetname', function($sheet) use ($phoneSuccess){
                         foreach ($phoneSuccess as $item){
-                            $array = (array) $item->row_data;
-                            $array[] = $item->site;
-                            $array[] = $item->company_name;
+
+                            $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
+                            $array = (array) $fullData->row_data;
+                            
                             $array[] = $item->phone;
                             $sheet->appendRow($array);
                         }
