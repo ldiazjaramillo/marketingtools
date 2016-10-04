@@ -78,6 +78,10 @@ class FormatEmailForDomain extends Model
 				'name' => $firstname[0].$lastname,
 				'template_id' => 'firstInitial_lastName'
 			],
+			'Firstname.Lastname' => [
+				'name' => $firstname.'.'.$lastname,
+				'template_id' => 'firstName_dot_lastName'
+			]
 		];
 
 		$extraQuerty = ['note' => $name];
