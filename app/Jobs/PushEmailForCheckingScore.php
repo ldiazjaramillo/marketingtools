@@ -38,7 +38,7 @@ class PushEmailForCheckingScore implements ShouldQueue
         $domain = $this->data['domain'];
         $data_id = $this->data['data_id'];
 
-        $variableName = \App\DataComparison::getVariableEmailName($name);
+        $variableName = \App\DataComparison::getVariableEmailName($name, $domain);
 
         $result = [];
         $emails = [];
@@ -100,7 +100,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                 ]);
 
                 //Create queue for checking google email
-                $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name);
+                $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
 
                 foreach($allVariantEmail as $nameForBadEmail){
                     GoogleCheckEmail::create([
