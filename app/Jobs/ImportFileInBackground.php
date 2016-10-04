@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Input;
+use Log;
 
 class ImportFileInBackground implements ShouldQueue
 {
@@ -54,13 +55,18 @@ class ImportFileInBackground implements ShouldQueue
 
             $company_name = $data[$this->getInput('field_company_name')];
 
-            $dataItem = \App\DataComparison::create([
-                'import_id' => $this->getInput('import_id'),
-                'name' => $data[$this->getInput('field_name')],
-                'company_name' => $company_name,
-                'site' => $url['host'],
-                'row_data' => $data,
-            ]);
+            try {
+                $dataItem = \App\DataComparison::create([
+                    'import_id' => $this->getInput('import_id'),
+                    'name' => $data[$this->getInput('field_name')],
+                    'company_name' => $company_name,
+                    'site' => $url['host'],
+                    'row_data' => $data,
+                ]);
+            } catch (\Exception $e){
+                Log::debug('Don\'t can import contact');
+                Log::debug(json_encode($data));
+            }
 
             if (!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0) {
                 GoogleCheckPhone::create([
