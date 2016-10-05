@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Serps\Core\Http\Proxy;
 
 class FindCompanySite implements ShouldQueue
 {
@@ -56,7 +57,7 @@ class FindCompanySite implements ShouldQueue
         if(!empty($results)){
             $first = $results[0]->getData();
             $firstUrl = parse_url($first['url']);
-            $firstUrl = str_replace('www.','',$firstUrl['host']);
+            $firstUrl = str_replace('www.', '', $firstUrl['host']);
         } else {
             $firstUrl = 'false';
         }
