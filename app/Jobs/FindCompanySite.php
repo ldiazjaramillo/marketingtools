@@ -54,7 +54,7 @@ class FindCompanySite implements ShouldQueue
 
         if($response->cssQuery('.r a')->length > 0){
             $firstUrl = parse_url($response->cssQuery('.r a')->item(0)->getAttribute('href'));
-            $firstUrl = $firstUrl['host'];
+            $firstUrl = str_replace('www.', '', $firstUrl['host']);
         } else {
             $firstUrl = 'false';
         }
