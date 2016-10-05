@@ -57,7 +57,7 @@ class FormatEmailForDomain extends Model
 				break;
 
 			default:
-				$result = $firstname.'.'.$lastname;
+				$result = $firstname.$lastname;
 				break;
 		}
 
@@ -81,6 +81,18 @@ class FormatEmailForDomain extends Model
 			'Firstname.Lastname' => [
 				'name' => $firstname.'.'.$lastname,
 				'template_id' => 'firstName_dot_lastName'
+			],
+			'Firstname' => [
+				'name' => $firstname,
+				'template_id' => 'firstName'
+			],
+			'Firstname_Lastname' => [
+				'name' => $firstname.'_'.$lastname,
+				'template_id' => 'firstName'
+			],
+			'Lastname'  => [
+				'name' => $lastname,
+				'template_id' => 'lastName'
 			]
 		];
 
