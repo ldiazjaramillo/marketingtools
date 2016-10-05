@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Serps\Core\Http\Proxy;
 
 class DetectedSiteCompany extends Command
 {
@@ -52,14 +53,9 @@ class DetectedSiteCompany extends Command
         $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
         $response = $googleClient->query($googleUrl, $proxy);
 
-        $results = $response->getNaturalResults()->getItems();
-
-        if(!empty($results)){
-            $first = $results[0]->getData();
-
-            $firstUrl = parse_url($first['url']);
+        if($response->cssQuery('.r a')->length > 0){
+            $firstUrl = parse_url($response->cssQuery('.r a')->item(0)->getAttribute('href'));
             $firstUrl = $firstUrl['host'];
-
         } else {
             $firstUrl = 'false';
         }
