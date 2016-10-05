@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\CheckEmailInGoogle::class,
         \App\Console\Commands\CheckPhoneInGoogle::class,
+        \App\Console\Commands\DetectedSiteCompany::class,
     ];
 
     /**

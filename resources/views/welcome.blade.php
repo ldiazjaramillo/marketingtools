@@ -92,6 +92,19 @@
                                 </form>
                             </div>
                         </td>
+                        <td width="100px"></td>
+                        <td>
+                            <div class="title m-b-md">Find a site company</div>
+
+                            <div class="links">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping_company" enctype="multipart/form-data">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="phone" value="true">
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                 </table>
 
