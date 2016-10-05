@@ -17,7 +17,7 @@ class DetectedSiteCompany extends Model
 			dispatch((new FindCompanySite([
 				'id' => $model->id,
 				'company_name' => $model->company_name,
-			]))->onQueue('datected_company_site'));
+			]))->onQueue('detected_company_site'));
 
 		});
 	}
