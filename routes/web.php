@@ -17,7 +17,31 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
+    \Log::debug('open main');
     return view('welcome');
+});
+
+Route::post('/mapping_phone', function (Illuminate\Http\Request $request) {
+    \Log::debug('open mapping_phone');
+    
+    $file = $request->file('import');
+
+    $file->storeAs('/public/', $file->getFilename());
+
+    $excel = Maatwebsite\Excel\Facades\Excel::load($file->getRealPath())->get()->toArray();
+
+    $header = array_keys(array_shift($excel));
+
+    $importInfo = \App\ImportInfo::create([
+        'name' => $file->getClientOriginalName(),
+        'total_row' => count($excel),
+        'file_name' => $file->getFilename(),
+        'type' => 'find_company_site'
+    ]);
+
+    $url = '/detected_phone';
+
+    return view('mapper_phone', compact('header', 'importInfo', 'url'));
 });
 
 Route::post('/mapping_company', function (Illuminate\Http\Request $request) {
@@ -60,12 +84,7 @@ Route::post('/mapping', function (Illuminate\Http\Request $request) {
         'type' => (empty($request->get('phone'))? 'detected_phone' : 'email_checker')
     ]);
 
-
-    if($request->get('phone')) {
-        $url = '/detected_phone';
-    } else {
-        $url = '/create_jobs';
-    }
+    $url = '/create_jobs';
 
     return view('mapper', compact('header', 'importInfo', 'url'));
 });
@@ -123,7 +142,8 @@ Route::post('/detected_site', function (){
 });
 
 Route::post('/detected_phone', function (){
-
+    \Log::debug('open detected_phone');
+    
     $importInfo = \App\ImportInfo::where([
         'id' => \Illuminate\Support\Facades\Input::get('import_id')
     ])->first();
@@ -138,6 +158,9 @@ Route::post('/detected_phone', function (){
     $header = array_shift($excelData);
 
     foreach(array_chunk($excelData, 200) as $arrayData){
+
+        \Log::debug('Push '.count($arrayData).' phone for import ' . json_encode($arrayData));
+
         dispatch((new \App\Jobs\ImportFileInBackground([
             'data' => $arrayData,
             'type_import' => 'phone',

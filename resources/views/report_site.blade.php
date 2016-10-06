@@ -71,7 +71,7 @@
         </div>
 
         <div class="title m-b-md" style="font-size: 24px;">
-            Find a site for company
+            Find a site by company name
         </div>
         <div class="links">
 

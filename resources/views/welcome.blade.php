@@ -84,7 +84,7 @@
                             <div class="title m-b-md">Find phone</div>
 
                             <div class="links">
-                                <form class="form-horizontal" role="form" method="POST" action="/mapping" enctype="multipart/form-data">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping_phone" enctype="multipart/form-data">
                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="phone" value="true">
                                     <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>

@@ -34,25 +34,36 @@ class PushEmailForCheckingScore implements ShouldQueue
      */
     public function handle()
     {
+
         $name = $this->data['name'];
         $domain = $this->data['domain'];
         $data_id = $this->data['data_id'];
 
+
         $variableName = \App\DataComparison::getVariableEmailName($name, $domain);
+        
+        \Log::info('Run PushEmailForCheckingScore ' . json_encode($variableName));
 
         $result = [];
         $emails = [];
 
         foreach($variableName as $name){
 
+
             $importInfo = DataComparison::where(['id' => $data_id])->first();
             $path_file = storage_path('app/public/' . $importInfo->import_id);
 
             $email = $name.'@'.$domain;
 
-            file_put_contents($path_file, "\r\n".'https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'."\r\n", FILE_APPEND);
+            \Log::info('Request to apilayer for ' . $email);
 
-            $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
+            try {
+                file_put_contents($path_file, "\r\n".'https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'."\r\n", FILE_APPEND);
+                $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
+
+            } catch (\Exception $e){
+                \Log::info('Failed request to apilayer.net ' . 'https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1');
+            }
 
             $log = ['import_id' => $importInfo->import_id, 'data_comparasion_id' => $importInfo->id];
 

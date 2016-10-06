@@ -18,7 +18,16 @@ class GoogleCheckPhone extends Model
 	public static function boot()
 	{
 		parent::boot();
+
+		static::updated(function($model){
+			\Log::debug('Update GoogleCheckPhone ' . json_encode($model));
+		});
+
 		static::created(function ($model) {
+
+			\Log::debug('Create GoogleCheckPhone ' . json_encode($model));
+			\Log::debug('Push GoogleCheckPhone in phone_finder');
+
 			dispatch(
 				(new GooglePhoneFinder([
 					'id' => $model->id,

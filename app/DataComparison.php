@@ -49,6 +49,7 @@ class DataComparison extends Model
 		} else {
 
 			$clientEmailBreaker = new Client(['base_uri' => 'http://www.emailbreaker.com/a/search/']);
+
 			$result = trim($clientEmailBreaker->get($domain, [
 				'proxy' => [
 					'http'  => 'tcp://' . env('PROXY_HOST', '37.48.118.90') . ':' . env('PROXY_PORT', '13012')
@@ -73,14 +74,20 @@ class DataComparison extends Model
 	public static function boot()
 	{
 		parent::boot();
+
+		static::updated(function($model){
+			\Log::debug('Update DataComparison ' . json_encode($model));
+		});
+
 		static::created(function ($model) {
+
+			\Log::info('Create new DataComparison ' . $model->id . ' ' . json_encode($model));
 
 			if(empty($model->site)){
 				$model->email = false;
 				$model->score = 0;
 				$model->save();
 			} else {
-
 				if($model->email != '0'){
 					dispatch(
 						(new PushEmailForCheckingScore([

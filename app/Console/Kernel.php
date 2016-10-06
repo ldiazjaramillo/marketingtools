@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\CheckEmailInGoogle::class,
         \App\Console\Commands\CheckPhoneInGoogle::class,
         \App\Console\Commands\DetectedSiteCompany::class,
+        \App\Console\Commands\ForseCreateJobForCheckingEmails::class,
     ];
 
     /**

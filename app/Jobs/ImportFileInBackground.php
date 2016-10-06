@@ -51,17 +51,23 @@ class ImportFileInBackground implements ShouldQueue
 
         $excelData = $this->data;
 
+        \Log::debug('Handle ImportFileInBackground phone for import. Count ' . count($excelData));
+
         foreach ($excelData as $line) {
             $data = array_values($line);
 
-            $host = str_replace(['http://', '//', 'www.'], ['', '', ''], strtolower($data[$this->getInput('field_site')]));
+            \Log::debug('$data = array_values ' . json_encode($data));
 
-            $url = parse_url('//' . $host);
+            if($this->getTypeImport() == 'phone'){
+                $url['host'] = '';
+            } else {
+                $host = str_replace(['http://', '//', 'www.'], ['', '', ''], strtolower($data[$this->getInput('field_site')]));
+                $url = parse_url('//' . $host);
+            }
 
-            $company_name = $data[$this->getInput('field_company_name')];
+            $company_name = trim(str_replace('_', '', $data[$this->getInput('field_company_name')]));
 
             try {
-
                 $dataComparation = [
                     'import_id' => $this->getInput('import_id'),
                     'name' => $data[$this->getInput('field_name')],
@@ -75,7 +81,7 @@ class ImportFileInBackground implements ShouldQueue
                 }
 
                 $dataItem = \App\DataComparison::create($dataComparation);
-                
+
             } catch (\Exception $e){
                 Log::debug('Don\'t can import contact');
                 Log::debug(json_encode($data));

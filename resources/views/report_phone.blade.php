@@ -71,7 +71,7 @@
         </div>
 
         <div class="title m-b-md" style="font-size: 24px;">
-            Detected phone for company
+            Find phone by company name
         </div>
         <div class="links">
 

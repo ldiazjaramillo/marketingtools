@@ -11,7 +11,8 @@
         "maatwebsite/excel": "^2.1",
         "serps/core": "^0.1.1",
         "serps/search-engine-google": "^0.1.0",
-        "serps/http-client-curl": "^0.1.0"
+        "serps/http-client-curl": "^0.1.0",
+        "jonnyw/php-phantomjs": "4.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -37,14 +38,17 @@
         ],
         "post-install-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
-            "php artisan optimize"
+            "php artisan optimize",
+            "PhantomInstaller\\Installer::installPhantomJS"
         ],
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
-            "php artisan optimize"
+            "php artisan optimize",
+            "PhantomInstaller\\Installer::installPhantomJS"
         ]
     },
     "config": {
-        "preferred-install": "dist"
+        "preferred-install": "dist",
+        "bin-dir": "bin"
     }
 }

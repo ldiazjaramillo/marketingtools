@@ -44,10 +44,12 @@ class CheckPhoneInGoogle extends Command
         $company_name = $this->argument('company_name');
 
         // Tell the client to use a user agent
-        $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
+        $userAgent = config('user_agent')[array_rand(config('user_agent'), 1)];
         $googleClient->request->setUserAgent($userAgent);
 
         $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
+
+        \Log::debug('Search phone in Google "' . $company_name . ' phone number' . '"');
 
         $googleUrl->setSearchTerm($company_name . ' phone number');
 
@@ -64,6 +66,9 @@ class CheckPhoneInGoogle extends Command
             $this->info('block with phone empty');
             $number = 0;
         }
+
+        \Log::debug('Results in Google ' . $number . ' for ' . $company_name);
+
 
         $this->info('number '.$number);
     }
