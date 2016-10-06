@@ -121,6 +121,14 @@ class PushEmailForCheckingScore implements ShouldQueue
                     ]);
                 }
 
+                dispatch(
+                    (new GoogleEmailChecker([
+                        'name' => $importInfo->name,
+                        'domain' => $domain,
+                        'data_comparasion_id' => $data_id,
+                    ]))->onQueue('email_checker_in_google')
+                );
+
                 return false;
             }
 

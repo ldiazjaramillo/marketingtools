@@ -14,15 +14,6 @@ class GoogleCheckEmail extends Model
         parent::boot();
         static::created(function ($model) {
 
-            \Log::debug('Create new GoogleCheckEmail ' . json_encode($model));
-
-            dispatch(
-                (new GoogleEmailChecker([
-                    'id' => $model->id,
-                    'email' => $model->email,
-                    'data_comparasion_id' => $model->data_comparasion_id,
-                ]))->onQueue('email_checker_in_google')
-            );
         });
     }
 }

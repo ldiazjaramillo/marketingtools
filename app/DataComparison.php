@@ -39,8 +39,7 @@ class DataComparison extends Model
 
 
 		$formatEmail = FormatEmailForDomain::where(['domain' => $domain]);
-
-
+		
 		if($formatEmail->count() == 1){
 
 			$formatEmail = $formatEmail->first();
