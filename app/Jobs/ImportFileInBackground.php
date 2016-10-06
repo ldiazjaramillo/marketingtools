@@ -24,6 +24,10 @@ class ImportFileInBackground implements ShouldQueue
      */
     protected $data = null;
 
+    /**
+     * @var null
+     */
+    protected $type_import = null;
 
     /**
      * Create a new job instance.
@@ -34,6 +38,7 @@ class ImportFileInBackground implements ShouldQueue
     {
         $this->setInput($initData['input']);
         $this->setData($initData['data']);
+        $this->setTypeImport($initData['type_import']);
     }
 
     /**
@@ -56,13 +61,21 @@ class ImportFileInBackground implements ShouldQueue
             $company_name = $data[$this->getInput('field_company_name')];
 
             try {
-                $dataItem = \App\DataComparison::create([
+
+                $dataComparation = [
                     'import_id' => $this->getInput('import_id'),
                     'name' => $data[$this->getInput('field_name')],
                     'company_name' => $company_name,
                     'site' => $url['host'],
                     'row_data' => $data,
-                ]);
+                ];
+
+                if($this->getTypeImport() == 'phone'){
+                    $dataComparation['email'] = '0';
+                }
+
+                $dataItem = \App\DataComparison::create($dataComparation);
+                
             } catch (\Exception $e){
                 Log::debug('Don\'t can import contact');
                 Log::debug(json_encode($data));
@@ -116,4 +129,23 @@ class ImportFileInBackground implements ShouldQueue
         $this->data = $data;
         return $this;
     }
+
+    /**
+     * @return null
+     */
+    public function getTypeImport()
+    {
+        return $this->type_import;
+    }
+
+    /**
+     * @param null $type_import
+     * @return ImportFileInBackground
+     */
+    public function setTypeImport($type_import)
+    {
+        $this->type_import = $type_import;
+        return $this;
+    }
+
 }

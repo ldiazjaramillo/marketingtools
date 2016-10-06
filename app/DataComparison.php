@@ -80,13 +80,16 @@ class DataComparison extends Model
 				$model->score = 0;
 				$model->save();
 			} else {
-				dispatch(
-					(new PushEmailForCheckingScore([
-						'data_id' => $model->id,
-						'name' => $model->name,
-						'domain' => $model->site
-					]))->onQueue('default')
-				);
+
+				if($model->email != '0'){
+					dispatch(
+						(new PushEmailForCheckingScore([
+							'data_id' => $model->id,
+							'name' => $model->name,
+							'domain' => $model->site
+						]))->onQueue('default')
+					);
+				}
 			}
 
 		});

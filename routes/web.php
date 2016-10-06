@@ -140,6 +140,7 @@ Route::post('/detected_phone', function (){
     foreach(array_chunk($excelData, 200) as $arrayData){
         dispatch((new \App\Jobs\ImportFileInBackground([
             'data' => $arrayData,
+            'type_import' => 'phone',
             'input' => \Illuminate\Support\Facades\Input::get(),
         ]))->onQueue('import_file'));
     }
@@ -165,6 +166,7 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
     foreach(array_chunk($excelData, 200) as $arrayData){
         dispatch((new \App\Jobs\ImportFileInBackground([
             'data' => $arrayData,
+            'type_import' => 'email',
             'input' => \Illuminate\Support\Facades\Input::get(),
         ]))->onQueue('import_file'));
     }
@@ -217,9 +219,9 @@ Route::get('/results/company_name/{id}', function (Illuminate\Http\Request $requ
 
 Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $id){
 
-    $phoneSuccess = \App\GoogleCheckPhone::where('phone', '>', '0')->where(['import_id' => $id]);
-    $phoneBad = \App\GoogleCheckPhone::where(['import_id' => $id])->where('phone', '=', '0');
-    $phoneQueue = \App\GoogleCheckPhone::whereNull('phone')->where(['import_id' => $id]);
+    $phoneSuccess = \App\DataComparison::where('phone', '>', '0')->where(['import_id' => $id]);
+    $phoneBad = \App\DataComparison::where(['import_id' => $id])->where('phone', '=', '0');
+    $phoneQueue = \App\DataComparison::whereNull('phone')->where(['import_id' => $id]);
 
     $type_report = \Illuminate\Support\Facades\Input::get('type');
     $data_source = \Illuminate\Support\Facades\Input::get('data_source');
@@ -233,10 +235,9 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
             $excel->sheet('Sheetname', function($sheet) use ($phoneBad){
                 foreach ($phoneBad as $item){
 
-                    $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
-                    $array = (array) $fullData->row_data;
-
+                    $array = (array) $item->row_data;
                     $array[] = $item->phone;
+
                     $sheet->appendRow($array);
                 }
             });
@@ -249,10 +250,9 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
             $excel->sheet('Sheetname', function($sheet) use ($phoneSuccess){
                 foreach ($phoneSuccess as $item){
 
-                    $fullData = \App\DataComparison::where(['id' => $item->data_comparasion_id])->first();
-                    $array = (array) $fullData->row_data;
-
+                    $array = (array) $item->row_data;
                     $array[] = $item->phone;
+
                     $sheet->appendRow($array);
                 }
             });
