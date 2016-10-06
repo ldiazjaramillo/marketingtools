@@ -17,13 +17,13 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
-    \Log::debug('open main');
+    //\Log::debug('open main');
     return view('welcome');
 });
 
 Route::post('/mapping_phone', function (Illuminate\Http\Request $request) {
-    \Log::debug('open mapping_phone');
-    
+    //\Log::debug('open mapping_phone');
+
     $file = $request->file('import');
 
     $file->storeAs('/public/', $file->getFilename());
@@ -142,7 +142,7 @@ Route::post('/detected_site', function (){
 });
 
 Route::post('/detected_phone', function (){
-    \Log::debug('open detected_phone');
+    //\Log::debug('open detected_phone');
     
     $importInfo = \App\ImportInfo::where([
         'id' => \Illuminate\Support\Facades\Input::get('import_id')
@@ -159,7 +159,7 @@ Route::post('/detected_phone', function (){
 
     foreach(array_chunk($excelData, 200) as $arrayData){
 
-        \Log::debug('Push '.count($arrayData).' phone for import ' . json_encode($arrayData));
+        //\Log::debug('Push '.count($arrayData).' phone for import ' . json_encode($arrayData));
 
         dispatch((new \App\Jobs\ImportFileInBackground([
             'data' => $arrayData,
