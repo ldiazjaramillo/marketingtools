@@ -3,7 +3,7 @@
 <project name="Rently" default="build" basedir=".">
 
     <target name="build"
-            depends="build-common,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpcb" />
+            depends="down,build-common,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpcb" />
 
     <target name="build-clean"
             depends="clean,build-common,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpcb" />
@@ -20,7 +20,23 @@
     <target name="build-parallel-clean"
             depends="clean,build-common,tools-parallel" />
 
-    <target name="build-common" depends="lint,prepare,storage-permissions,composer,migrate,storage-permissions,storage-symlink" />
+    <target name="build-common" depends="lint,prepare,storage-permissions,composer,migrate,storage-permissions,storage-symlink,up" />
+
+    <target name="down" description="Down project">
+        <echo>Down project</echo>
+        <exec executable="php" failonerror="true">
+            <arg value="artisan" />
+            <arg value="down" />
+        </exec>
+    </target>
+
+    <target name="up" description="Down project">
+        <echo>Down project</echo>
+        <exec executable="php" failonerror="true">
+            <arg value="artisan" />
+            <arg value="down" />
+        </exec>
+    </target>
 
     <target name="tools-parallel" description="Run tools in parallel">
         <parallel threadCount="2">
