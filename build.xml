@@ -34,7 +34,7 @@
         <echo>Down project</echo>
         <exec executable="php" failonerror="true">
             <arg value="artisan" />
-            <arg value="down" />
+            <arg value="up" />
         </exec>
     </target>
 
