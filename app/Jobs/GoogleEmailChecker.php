@@ -51,9 +51,7 @@ class GoogleEmailChecker implements ShouldQueue
 
 				//\Log::debug('Handle GoogleEmailChecker ' . $email);
 
-
 				$count_result = 0;
-
 
 				// Tell the client to use a user agent
 				$userAgent = config('user_agent')[array_rand(config('user_agent'), 1)];
@@ -123,7 +121,7 @@ class GoogleEmailChecker implements ShouldQueue
 			try{
 				//\Log::debug('Total results for ' . $email . ' ' . $count_result);
 
-				GoogleCheckEmail::where(['id' => $this->data['id']])->update(['count_results' => $count_result]);
+				GoogleCheckEmail::where(['email' => $email])->update(['count_results' => $count_result]);
 
 				if ($count_result > 0) {
 					DataComparison::where(['id' => $this->data['data_comparasion_id']])->update(['email' => $email, 'score' => 99.99]);
