@@ -73,7 +73,11 @@ class GooglePhoneFinder implements ShouldQueue
 
             DataComparison::where(['site' => $checkFone->site])->update(['phone' => $number]);
         } catch (\Exception $e){
+
             Bugsnag::notifyException($e);
+
+            throw new \Exception('failed phone detected');
+
         }
 
     }
