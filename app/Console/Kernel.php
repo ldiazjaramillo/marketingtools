@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\CheckPhoneInGoogle::class,
         \App\Console\Commands\DetectedSiteCompany::class,
         \App\Console\Commands\ForseCreateJobForCheckingEmails::class,
+        \App\Console\Commands\ForseCreateJobForCheckingEmailsInSearchEngine::class,
         \Bugsnag\BugsnagLaravel\Commands\DeployCommand::class,
     ];
 
