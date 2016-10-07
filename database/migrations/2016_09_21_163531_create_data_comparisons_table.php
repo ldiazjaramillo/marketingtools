@@ -19,7 +19,7 @@ class CreateDataComparisonsTable extends Migration
             $table->integer('import_id')->unsigned();
             $table->foreign('import_id')->references('id')->on('import_infos');
 
-            $table->string('name', 255);
+            $table->string('name', 255)->nullable();
             $table->string('company_name', 255)->nullable();
             $table->string('site', 255)->nullable();
 
