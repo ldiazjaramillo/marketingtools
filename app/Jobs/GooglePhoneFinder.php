@@ -10,7 +10,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Log;
+//use Log;
 use Serps\Core\Http\Proxy;
 
 class GooglePhoneFinder implements ShouldQueue
@@ -38,7 +38,7 @@ class GooglePhoneFinder implements ShouldQueue
     public function handle()
     {
 
-        \Log::debug('Handle GooglePhoneFinder');
+        //\Log::debug('Handle GooglePhoneFinder');
 
         $googleClient = new \Serps\SearchEngine\Google\GoogleClient(new \Serps\HttpClient\CurlClient());
         try{
@@ -49,7 +49,7 @@ class GooglePhoneFinder implements ShouldQueue
 
             $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
 
-            \Log::debug('Search phone in Google "' . $this->data['company_name'] . ' phone number' . '"');
+            //\Log::debug('Search phone in Google "' . $this->data['company_name'] . ' phone number' . '"');
 
             $googleUrl->setSearchTerm($this->data['company_name'] . ' phone number');
 

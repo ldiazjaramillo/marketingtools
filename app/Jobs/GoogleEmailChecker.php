@@ -49,7 +49,7 @@ class GoogleEmailChecker implements ShouldQueue
 			try {
 				$email = $nameEmail . '@' . $this->domain;
 
-				\Log::debug('Handle GoogleEmailChecker ' . $email);
+				//\Log::debug('Handle GoogleEmailChecker ' . $email);
 
 
 				$count_result = 0;
@@ -62,7 +62,7 @@ class GoogleEmailChecker implements ShouldQueue
 				$googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
 				$googleUrl->setSearchTerm('"' . $email . '"');
 
-				\Log::debug('Start find email ' . $email . ' in Google');
+				//\Log::debug('Start find email ' . $email . ' in Google');
 
 				$proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
 				$response = $googleClient->query($googleUrl, $proxy);
@@ -82,16 +82,16 @@ class GoogleEmailChecker implements ShouldQueue
 
 				Bugsnag::notifyException($e);
 
-				\Log::debug('Exception GoogleEmailChecker');
+				//\Log::debug('Exception GoogleEmailChecker');
 
-				\Log::debug(json_encode([
+				/*\Log::debug(json_encode([
 					'file' => $e->getFile(),
 					'line' => $e->getLine(),
 					'message' => $e->getMessage(),
-				]));
+				]));*/
 
 
-				\Log::debug('Start find email ' . $email . ' in Bing');
+				//\Log::debug('Start find email ' . $email . ' in Bing');
 
 				try {
 					$bingClient = new Client([
@@ -121,7 +121,7 @@ class GoogleEmailChecker implements ShouldQueue
 
 
 			try{
-				\Log::debug('Total results for ' . $email . ' ' . $count_result);
+				//\Log::debug('Total results for ' . $email . ' ' . $count_result);
 
 				GoogleCheckEmail::where(['id' => $this->data['id']])->update(['count_results' => $count_result]);
 

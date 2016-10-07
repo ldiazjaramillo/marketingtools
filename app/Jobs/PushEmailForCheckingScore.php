@@ -10,7 +10,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Log;
+//use Log;
 
 class PushEmailForCheckingScore implements ShouldQueue
 {
@@ -43,7 +43,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
 		$variableName = \App\DataComparison::getVariableEmailName($name, $domain);
 
-		\Log::info('Run PushEmailForCheckingScore ' . json_encode($variableName));
+		//\Log::info('Run PushEmailForCheckingScore ' . json_encode($variableName));
 
 		$result = [];
 		$emails = [];
@@ -56,7 +56,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
 				$email = $name . '@' . $domain;
 
-				\Log::info('Request to apilayer for ' . $email);
+				//\Log::info('Request to apilayer for ' . $email);
 
 
 				file_put_contents($path_file, "\r\n" . 'https://apilayer.net/api/check?access_key=' . env('MAILBOX_API_KEY') . '&email=' . $email . '&smtp=1&format=1&catch_all=1' . "\r\n", FILE_APPEND);
@@ -71,12 +71,12 @@ class PushEmailForCheckingScore implements ShouldQueue
 				file_put_contents($path_file, 'Result response ' . "\r\n\r\n" . json_encode($request) . "\r\n\r\n", FILE_APPEND);
 
 				if (!$request['format_valid']) {
-					Log::warning('Invalid email ' . $email);
+					//Log::warning('Invalid email ' . $email);
 					continue;
 				} else {
 					$score = $request['score'];
 
-					Log::info('Get score for ' . $email . ' ' . $score);
+					//Log::info('Get score for ' . $email . ' ' . $score);
 
 					$result[$score] = $email;
 					$emails[] = $email;
@@ -89,8 +89,8 @@ class PushEmailForCheckingScore implements ShouldQueue
 					$score = max($keys);
 					$email = $result[$score];
 
-					Log::notice('Select best score for ' . $email . ' ' . $score);
-					Log::notice('JSON ' . json_encode($result));
+					//Log::notice('Select best score for ' . $email . ' ' . $score);
+					//Log::notice('JSON ' . json_encode($result));
 
 					DataComparison::where(['id' => $data_id])->update([
 						'score' => $score,
@@ -101,7 +101,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
 				} elseif ($request['catch_all'] == true) {
 
-					Log::warning('Catch all for ' . $email . ' score ' . $score);
+					//Log::warning('Catch all for ' . $email . ' score ' . $score);
 
 					DataComparison::where(['id' => $data_id])->update([
 						'score' => 0,
@@ -132,13 +132,13 @@ class PushEmailForCheckingScore implements ShouldQueue
 
 
 			} catch (\Exception $e) {
-				\Log::info('Failed request to apilayer.net ' . 'https://apilayer.net/api/check?access_key=' . env('MAILBOX_API_KEY') . '&email=' . $email . '&smtp=1&format=1&catch_all=1');
+				//\Log::info('Failed request to apilayer.net ' . 'https://apilayer.net/api/check?access_key=' . env('MAILBOX_API_KEY') . '&email=' . $email . '&smtp=1&format=1&catch_all=1');
 				Bugsnag::notifyException($e);
 			}
 
 		}
 
-		Log::warning('All score equal. Brute force email failed');
+		//Log::warning('All score equal. Brute force email failed');
 		DataComparison::where(['id' => $data_id])->update([
 			'score' => 0,
 			'email' => false

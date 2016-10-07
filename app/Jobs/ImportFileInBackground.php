@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Input;
-use Log;
+//use Log;
 
 class ImportFileInBackground implements ShouldQueue
 {
@@ -52,14 +52,14 @@ class ImportFileInBackground implements ShouldQueue
 
 		$excelData = $this->data;
 
-		\Log::debug('Handle ImportFileInBackground phone for import. Count ' . count($excelData));
+		//\Log::debug('Handle ImportFileInBackground phone for import. Count ' . count($excelData));
 
 		foreach ($excelData as $line) {
 			try {
 
 				$data = array_values($line);
 
-				\Log::debug('$data = array_values ' . json_encode($data));
+				//\Log::debug('$data = array_values ' . json_encode($data));
 
 				if ($this->getTypeImport() == 'phone') {
 					$url['host'] = '';
@@ -96,8 +96,8 @@ class ImportFileInBackground implements ShouldQueue
 
 			} catch (\Exception $e) {
 				Bugsnag::notifyException($e);
-				Log::debug('Don\'t can import contact');
-				Log::debug(json_encode($data));
+				//Log::debug('Don\'t can import contact');
+				//Log::debug(json_encode($data));
 			}
 
 		}
