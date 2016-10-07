@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\DataComparison;
 use App\GoogleCheckEmail;
 use App\LogCallApi;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -63,6 +64,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             } catch (\Exception $e){
                 \Log::info('Failed request to apilayer.net ' . 'https://apilayer.net/api/check?access_key='.env('MAILBOX_API_KEY').'&email=' . $email . '&smtp=1&format=1&catch_all=1');
+                Bugsnag::notifyException($e);
             }
 
             $log = ['import_id' => $importInfo->import_id, 'data_comparasion_id' => $importInfo->id];

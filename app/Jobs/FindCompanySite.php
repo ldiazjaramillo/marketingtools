@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DataComparison;
 use App\DetectedSiteCompany;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -41,26 +42,33 @@ class FindCompanySite implements ShouldQueue
 
         $company_name = $this->getCompanyname();
 
-        // Tell the client to use a user agent
-        $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
-        $googleClient->request->setUserAgent($userAgent);
+        try{
+            // Tell the client to use a user agent
+            $userAgent = config('user_agent')[array_rand(config('user_agent'), 1)];
+            $googleClient->request->setUserAgent($userAgent);
 
-        $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
+            $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
 
-        $googleUrl->setSearchTerm($company_name . ' company');
+            $googleUrl->setSearchTerm($company_name . ' company');
 
-        $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
-        $response = $googleClient->query($googleUrl, $proxy);
+            $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
+            $response = $googleClient->query($googleUrl, $proxy);
 
-        if($response->cssQuery('.r a')->length > 0){
-            $firstUrl = parse_url($response->cssQuery('.r a')->item(0)->getAttribute('href'));
-            $firstUrl = str_replace('www.', '', $firstUrl['host']);
-        } else {
-            $firstUrl = 'false';
+            if($response->cssQuery('.r a')->length > 0){
+                $firstUrl = parse_url($response->cssQuery('.r a')->item(0)->getAttribute('href'));
+                $firstUrl = str_replace('www.', '', $firstUrl['host']);
+            } else {
+                $firstUrl = 'false';
+            }
+
+            DataComparison::where(['company_name' => $company_name])->update(['site' => $firstUrl]);
+            DetectedSiteCompany::where(['id' => $this->getId()])->update(['site' => $firstUrl]);
+
+        } catch (\Exception $e){
+            Bugsnag::notifyException($e);
         }
 
-        DataComparison::where(['company_name' => $company_name])->update(['site' => $firstUrl]);
-        DetectedSiteCompany::where(['id' => $this->getId()])->update(['site' => $firstUrl]);
+
     }
 
     /**

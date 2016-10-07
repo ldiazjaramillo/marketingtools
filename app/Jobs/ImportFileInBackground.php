@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\GoogleCheckPhone;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -83,6 +84,7 @@ class ImportFileInBackground implements ShouldQueue
                 $dataItem = \App\DataComparison::create($dataComparation);
 
             } catch (\Exception $e){
+                Bugsnag::notifyException($e);
                 Log::debug('Don\'t can import contact');
                 Log::debug(json_encode($data));
             }

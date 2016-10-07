@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DataComparison;
 use App\GoogleCheckEmail;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -55,7 +56,7 @@ class GoogleEmailChecker implements ShouldQueue
             try {
 
                 // Tell the client to use a user agent
-                $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
+                $userAgent = config('user_agent')[array_rand(config('user_agent'), 1)];
                 $googleClient->request->setUserAgent($userAgent);
 
                 $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
@@ -79,6 +80,8 @@ class GoogleEmailChecker implements ShouldQueue
 
             } catch (\Exception $e){
 
+                Bugsnag::notifyException($e);
+
                 \Log::debug('Exception GoogleEmailChecker');
 
                 \Log::debug(json_encode([
@@ -90,25 +93,29 @@ class GoogleEmailChecker implements ShouldQueue
 
                 \Log::debug('Start find email ' . $email . ' in Bing');
 
-                $bingClient = new Client([
-                    'base_uri' => 'https://bing.com/',
-                    'headers' => [
-                        'User-Agent' => config('user_agent')[array_rand(config('user_agent'), 1)]
-                    ]
-                ]);
+                try{
+                    $bingClient = new Client([
+                        'base_uri' => 'https://bing.com/',
+                        'headers' => [
+                            'User-Agent' => config('user_agent')[array_rand(config('user_agent'), 1)]
+                        ]
+                    ]);
 
-                $bingResultPage = $bingClient->get('search', [
-                    'query' => [
-                        'q' => '"' . $email . '"'
-                    ],
-                    'proxy' => [
-                        'http' => 'tcp://' . env('PROXY_HOST', '37.48.118.90') . ':' . env('PROXY_PORT', '13012')
-                    ]
-                ])->getBody()->getContents();
+                    $bingResultPage = $bingClient->get('search', [
+                        'query' => [
+                            'q' => '"' . $email . '"'
+                        ],
+                        'proxy' => [
+                            'http' => 'tcp://' . env('PROXY_HOST', '37.48.118.90') . ':' . env('PROXY_PORT', '13012')
+                        ]
+                    ])->getBody()->getContents();
 
-                $isResultBing = (!(bool) strpos($bingResultPage, 'class="b_no"'));
+                    $isResultBing = (!(bool) strpos($bingResultPage, 'class="b_no"'));
 
-                $count_result = ($isResultBing)? 1 : 0;
+                    $count_result = ($isResultBing)? 1 : 0;
+                } catch (\Exception $e){
+                    Bugsnag::notifyException($e);
+                }
 
             }
 

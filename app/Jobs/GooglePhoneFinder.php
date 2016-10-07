@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DataComparison;
 use App\GoogleCheckPhone;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -51,6 +52,7 @@ class GooglePhoneFinder implements ShouldQueue
 
         $googleUrl->setSearchTerm($this->data['company_name'] . ' phone number');
 
+        try{
             $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
             $response = $googleClient->query($googleUrl, $proxy);
 
@@ -64,11 +66,14 @@ class GooglePhoneFinder implements ShouldQueue
                 $number = 0;
             }
 
-        $checkFone = GoogleCheckPhone::where(['id' => $this->data['id']])->first();
-        $checkFone->phone = $number;
-        $checkFone->save();
+            $checkFone = GoogleCheckPhone::where(['id' => $this->data['id']])->first();
+            $checkFone->phone = $number;
+            $checkFone->save();
 
-        DataComparison::where(['site' => $checkFone->site])->update(['phone' => $number]);
+            DataComparison::where(['site' => $checkFone->site])->update(['phone' => $number]);
+        } catch (\Exception $e){
+            Bugsnag::notifyException($e);
+        }
 
     }
 }
