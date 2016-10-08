@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\DataComparison;
 use App\GoogleCheckEmail;
+use App\Jobs\GoogleEmailChecker;
 use App\Jobs\PushEmailForCheckingScore;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Illuminate\Console\Command;
 
 class ForseCreateJobForCheckingEmailsInSearchEngine extends Command
@@ -40,37 +42,45 @@ class ForseCreateJobForCheckingEmailsInSearchEngine extends Command
      */
     public function handle()
     {
-        $import_id = $this->argument('import_id');
+        try{
 
-        $allDataComparison = DataComparison::where(['import_id' => $import_id, 'email' => 0])->select(['id', 'name', 'site'])->first();
+            $import_id = $this->argument('import_id');
+
+            $allDataComparison = DataComparison::where(['import_id' => $import_id, 'email' => 0])->select(['id', 'name', 'site', 'import_id'])->get();
 
 
-        $allVariableEmailName = \App\DataComparison::getVariableEmailName($allDataComparison->name, $allDataComparison->site);
+            $this->info('Start push in queue. Total ' . count($allDataComparison));
 
-        foreach($allVariableEmailName as $nameEmail){
-            GoogleCheckEmail::create([
-                'import_id' => $allDataComparison->import_id,
-                'email' => $nameEmail,
-                'data_comparasion_id' => $allDataComparison->id
-            ]);
+            $bar = $this->output->createProgressBar(count($allDataComparison));
+
+            foreach ($allDataComparison as $key => $itemData){
+
+                $allVariableEmailName = \App\DataComparison::getVariableEmailName($itemData->name, $itemData->site);
+
+                foreach($allVariableEmailName as $nameEmail){
+                    GoogleCheckEmail::create([
+                        'import_id' => $itemData->import_id,
+                        'email' => $nameEmail,
+                        'data_comparasion_id' => $itemData->id
+                    ]);
+                }
+
+                dispatch(
+                    (new GoogleEmailChecker([
+                        'name' => $itemData->name,
+                        'domain' => $itemData->site,
+                        'data_comparasion_id' => $itemData->id,
+                    ]))->onQueue('email_checker_in_google')
+                );
+
+                $bar->advance();
+                unset($allDataComparison[$key]);
+
+            }
+
+        } catch (\Exception $e){
+            Bugsnag::notifyException($e);
         }
 
-        $this->info('Start push in queue. Total ' . count($allDataComparison));
-
-        $bar = $this->output->createProgressBar(count($allDataComparison));
-
-        foreach ($allDataComparison as $key => $item){
-
-            dispatch(
-                (new PushEmailForCheckingScore([
-                    'data_id' => $item->id,
-                    'name' => $item->name,
-                    'domain' => $item->site
-                ]))->onQueue('default')
-            );
-
-            $bar->advance();
-            unset($allDataComparison[$key]);
-        }
     }
 }

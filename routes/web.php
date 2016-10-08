@@ -289,7 +289,7 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
 
 Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 
-    $checkEmailInGoogle = \App\GoogleCheckEmail::where(['import_id' => $id])->whereNull('count_results')->get()->pluck('email','data_comparasion_id');
+    $checkEmailInGoogle = \App\GoogleCheckEmail::where(['import_id' => $id])->whereNull('count_results')->get()->groupBy('data_comparasion_id')->pluck('email','data_comparasion_id');
 
     $success = \App\DataComparison::where('score', '>', 0)->where(['import_id' => $id]);
 

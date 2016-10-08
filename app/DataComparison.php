@@ -67,6 +67,8 @@ class DataComparison extends Model
 
 		}
 
+		$allVariantEmailName = array_unique($allVariantEmailName);
+
 		return $allVariantEmailName;
 	}
 
