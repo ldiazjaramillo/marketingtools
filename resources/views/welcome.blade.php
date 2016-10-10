@@ -80,11 +80,18 @@
                                 </form>
 
                                 <div style="height: 300px; overflow-y: scroll;">
-                                    <ul>
+                                    <table>
                                         @foreach($detected_email as $item)
-                                            <li><a href="/results/{{$item['id']}}" target="_blank">{{$item['name']}}</a></li>
+                                            <tr>
+                                                <td>
+                                                    <a href="/results/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
                                         @endforeach;
-                                    </ul>
+                                    </table>
                                 </div>
                             </div>
                         </td>
@@ -102,11 +109,18 @@
                                 </form>
 
                                 <div style="height: 300px; overflow-y: scroll;">
-                                    <ul>
+                                    <table>
                                         @foreach($detected_phone as $item)
-                                            <li><a href="/results/phone/{{$item['id']}}" target="_blank">{{$item['name']}}</a></li>
+                                            <tr>
+                                                <td>
+                                                    <a href="/results/phone/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
                                         @endforeach;
-                                    </ul>
+                                    </table>
                                 </div>
 
                             </div>
@@ -125,11 +139,18 @@
                                 </form>
 
                                 <div style="height: 300px; overflow-y: scroll;">
-                                    <ul>
+                                    <table>
                                         @foreach($site_company as $item)
-                                            <li><a href="/results/company_name/{{$item['id']}}" target="_blank">{{$item['name']}}</a></li>
+                                            <tr>
+                                                <td>
+                                                    <a href="/results/company_name/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
                                         @endforeach;
-                                    </ul>
+                                    </table>
                                 </div>
 
                             </div>
