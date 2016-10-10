@@ -119,7 +119,7 @@
                                                     {{$item['total_row']}}
                                                 </td>
                                             </tr>
-                                        @endforeach;
+                                        @endforeach
                                     </table>
                                 </div>
 
