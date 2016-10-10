@@ -76,7 +76,16 @@
                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                     <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
                                     <input type="submit" id="submit" value="Submit"/>
+                                    <p>Will check email and phone</p>
                                 </form>
+
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <ul>
+                                        @foreach($detected_email as $item)
+                                            <li><a href="/results/{{$item['id']}}" target="_blank">{{$item['name']}}</a></li>
+                                        @endforeach;
+                                    </ul>
+                                </div>
                             </div>
                         </td>
                         <td width="100px"></td>
@@ -89,7 +98,17 @@
                                     <input type="hidden" name="phone" value="true">
                                     <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
                                     <input type="submit" id="submit" value="Submit"/>
+                                    <p>Will check only phone!</p>
                                 </form>
+
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <ul>
+                                        @foreach($detected_phone as $item)
+                                            <li><a href="/results/phone/{{$item['id']}}" target="_blank">{{$item['name']}}</a></li>
+                                        @endforeach;
+                                    </ul>
+                                </div>
+
                             </div>
                         </td>
                         <td width="100px"></td>
@@ -102,7 +121,17 @@
                                     <input type="hidden" name="phone" value="true">
                                     <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
                                     <input type="submit" id="submit" value="Submit"/>
+                                    <p>Will check only site company!</p>
                                 </form>
+
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <ul>
+                                        @foreach($site_company as $item)
+                                            <li><a href="/results/company_name/{{$item['id']}}" target="_blank">{{$item['name']}}</a></li>
+                                        @endforeach;
+                                    </ul>
+                                </div>
+
                             </div>
                         </td>
                     </tr>

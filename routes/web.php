@@ -18,7 +18,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
     //\Log::debug('open main');
-    return view('welcome');
+    $site_company = \App\ImportInfo::where(['type' => 'find_company_site'])->get()->sortByDesc('id')->toArray();
+    $detected_phone = \App\ImportInfo::where(['type' => 'detected_phone'])->get()->sortByDesc('id')->toArray();
+    $detected_email = \App\ImportInfo::where(['type' => 'email_checker'])->get()->sortByDesc('id')->toArray();
+
+    return view('welcome', compact('site_company', 'detected_phone', 'detected_email'));
 });
 
 Route::post('/mapping_phone', function (Illuminate\Http\Request $request) {
@@ -36,7 +40,7 @@ Route::post('/mapping_phone', function (Illuminate\Http\Request $request) {
         'name' => $file->getClientOriginalName(),
         'total_row' => count($excel),
         'file_name' => $file->getFilename(),
-        'type' => 'find_company_site'
+        'type' => 'detected_phone'
     ]);
 
     $url = '/detected_phone';
@@ -81,7 +85,7 @@ Route::post('/mapping', function (Illuminate\Http\Request $request) {
         'name' => $file->getClientOriginalName(),
         'total_row' => count($excel),
         'file_name' => $file->getFilename(),
-        'type' => (empty($request->get('phone'))? 'detected_phone' : 'email_checker')
+        'type' => 'email_checker'
     ]);
 
     $url = '/create_jobs';
@@ -199,13 +203,16 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
 Route::get('/results/company_name/{id}', function (Illuminate\Http\Request $request, $id){
 
+    $info = \App\ImportInfo::where(['id' => $id])->first();
+
+    if($info->type == 'detected_phone'){ return redirect('/results/phone/'.$id); }
+    if($info->type == 'email_checker'){ return redirect('/results/'.$id); }
+
     $companySuccess = \App\DataComparison::where('site', '!=', 'false')->where('site', '!=', '')->where(['import_id' => $id]);
     $companyBad = \App\DataComparison::where(['import_id' => $id])->where('site', '=', 'false');
     $companyQueue = \App\DetectedSiteCompany::whereNull('site')->where(['import_id' => $id]);
 
     $type_report = \Illuminate\Support\Facades\Input::get('type');
-
-    $info = \App\ImportInfo::where(['id' => $id])->first();
 
     if($type_report == 'bad'){
 
@@ -242,6 +249,11 @@ Route::get('/results/company_name/{id}', function (Illuminate\Http\Request $requ
 
 Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $id){
 
+    $info = \App\ImportInfo::where(['id' => $id])->first();
+
+    if($info->type == 'email_checker'){ return redirect('/results/'.$id); }
+    if($info->type == 'find_company_site'){ return redirect('/results/company_name/'.$id); }
+
     $phoneSuccess = \App\DataComparison::where('phone', '>', '0')->where(['import_id' => $id]);
     $phoneBad = \App\DataComparison::where(['import_id' => $id])->where('phone', '=', '0');
     $phoneQueue = \App\DataComparison::whereNull('phone')->where(['import_id' => $id]);
@@ -249,7 +261,7 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
     $type_report = \Illuminate\Support\Facades\Input::get('type');
     $data_source = \Illuminate\Support\Facades\Input::get('data_source');
 
-    $info = \App\ImportInfo::where(['id' => $id])->first();
+
 
     if($type_report == 'bad'){
 
@@ -289,6 +301,10 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
 
 Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 
+    $info = \App\ImportInfo::where(['id' => $id])->first();
+    if($info->type == 'detected_phone'){ return redirect('/results/phone/'.$id); }
+    if($info->type == 'find_company_site'){ return redirect('/results/company_name/'.$id); }
+
     $checkEmailInGoogle = \App\GoogleCheckEmail::where(['import_id' => $id])->whereNull('count_results')->get()->pluck('email','data_comparasion_id');
 
     $success = \App\DataComparison::where('score', '>', 0)->where(['import_id' => $id]);
@@ -305,8 +321,6 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 
     $type_report = \Illuminate\Support\Facades\Input::get('type');
     $data_source = \Illuminate\Support\Facades\Input::get('data_source');
-
-    $info = \App\ImportInfo::where(['id' => $id])->first();
 
     if($type_report == 'bad'){
 
