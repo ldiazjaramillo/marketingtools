@@ -54,8 +54,8 @@ class GoogleEmailChecker implements ShouldQueue
 				$count_result = 0;
 
 				// Tell the client to use a user agent
-				$userAgent = config('user_agent')[array_rand(config('user_agent'), 1)];
-				$googleClient->request->setUserAgent($userAgent);
+                $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
+                $googleClient->request->setUserAgent($userAgent);
 
 				$googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
 				$googleUrl->setSearchTerm('"' . $email . '"');
@@ -121,6 +121,7 @@ class GoogleEmailChecker implements ShouldQueue
 			try{
 				//\Log::debug('Total results for ' . $email . ' ' . $count_result);
 
+				GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id']])->update(['count_results' => 0]);
 				GoogleCheckEmail::where(['email' => $email])->update(['count_results' => $count_result]);
 
 				if ($count_result > 0) {

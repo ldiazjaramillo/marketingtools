@@ -44,7 +44,7 @@ class GooglePhoneFinder implements ShouldQueue
         try{
 
             // Tell the client to use a user agent
-            $userAgent = config('user_agent')[array_rand(config('user_agent'), 1)];
+            $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
             $googleClient->request->setUserAgent($userAgent);
 
             $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();

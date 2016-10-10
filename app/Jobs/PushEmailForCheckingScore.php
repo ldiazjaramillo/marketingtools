@@ -134,9 +134,46 @@ class PushEmailForCheckingScore implements ShouldQueue
 			} catch (\Exception $e) {
 				//\Log::info('Failed request to apilayer.net ' . 'https://apilayer.net/api/check?access_key=' . env('MAILBOX_API_KEY') . '&email=' . $email . '&smtp=1&format=1&catch_all=1');
 				Bugsnag::notifyException($e);
+
+                $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
+
+                foreach ($allVariantEmail as $nameForBadEmail) {
+                    GoogleCheckEmail::create([
+                        'import_id' => $importInfo->import_id,
+                        'email' => $nameForBadEmail . '@' . $domain,
+                        'data_comparasion_id' => $data_id
+                    ]);
+                }
+
+                dispatch(
+                    (new GoogleEmailChecker([
+                        'name' => $importInfo->name,
+                        'domain' => $domain,
+                        'data_comparasion_id' => $data_id,
+                    ]))->onQueue('email_checker_in_google')
+                );
+
 			}
 
 		}
+
+        $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
+
+        foreach ($allVariantEmail as $nameForBadEmail) {
+            GoogleCheckEmail::create([
+                'import_id' => $importInfo->import_id,
+                'email' => $nameForBadEmail . '@' . $domain,
+                'data_comparasion_id' => $data_id
+            ]);
+        }
+
+        dispatch(
+            (new GoogleEmailChecker([
+                'name' => $importInfo->name,
+                'domain' => $domain,
+                'data_comparasion_id' => $data_id,
+            ]))->onQueue('email_checker_in_google')
+        );
 
 		//Log::warning('All score equal. Brute force email failed');
 		DataComparison::where(['id' => $data_id])->update([
