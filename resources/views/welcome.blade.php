@@ -25,9 +25,9 @@
             }
 
             .flex-center {
-                align-items: center;
                 display: flex;
                 justify-content: center;
+                margin-top: 100px;
             }
 
             .position-ref {
@@ -45,7 +45,7 @@
             }
 
             .title {
-                font-size: 44px;
+                font-size: 24px;
             }
 
             .links > a {
@@ -156,6 +156,40 @@
                             </div>
                         </td>
                     </tr>
+
+                    <tr>
+                        <td colspan="5">
+                            <div class="title m-b-md">Find a linkedin profile</div>
+
+                            <div class="links">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping_linkedin" enctype="multipart/form-data">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="phone" value="true">
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
+                                    <p>Will check only profile linkedin!</p>
+                                </form>
+
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <table>
+                                        @foreach($linkedin as $item)
+                                            <tr>
+                                                <td>
+                                                    <a href="/results/linkedin/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </td>
+                    </tr>
+
                 </table>
 
 

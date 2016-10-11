@@ -21,8 +21,31 @@ Route::get('/', function () {
     $site_company = \App\ImportInfo::where(['type' => 'find_company_site'])->get()->sortByDesc('id')->toArray();
     $detected_phone = \App\ImportInfo::where(['type' => 'detected_phone'])->get()->sortByDesc('id')->toArray();
     $detected_email = \App\ImportInfo::where(['type' => 'email_checker'])->get()->sortByDesc('id')->toArray();
+    $linkedin = \App\ImportInfo::where(['type' => 'linkedin'])->get()->sortByDesc('id')->toArray();
 
-    return view('welcome', compact('site_company', 'detected_phone', 'detected_email'));
+    return view('welcome', compact('site_company', 'detected_phone', 'detected_email', 'linkedin'));
+});
+
+Route::post('/mapping_linkedin', function (Illuminate\Http\Request $request) {
+
+    $file = $request->file('import');
+
+    $file->storeAs('/public/', $file->getFilename());
+
+    $excel = Maatwebsite\Excel\Facades\Excel::load($file->getRealPath())->get()->toArray();
+
+    $header = array_keys(array_shift($excel));
+
+    $importInfo = \App\ImportInfo::create([
+        'name' => $file->getClientOriginalName(),
+        'total_row' => count($excel),
+        'file_name' => $file->getFilename(),
+        'type' => 'linkedin'
+    ]);
+
+    $url = '/detected_linkedin';
+
+    return view('mapper_linkedin', compact('header', 'importInfo', 'url'));
 });
 
 Route::post('/mapping_phone', function (Illuminate\Http\Request $request) {
@@ -147,7 +170,7 @@ Route::post('/detected_site', function (){
 
 Route::post('/detected_phone', function (){
     //\Log::debug('open detected_phone');
-    
+
     $importInfo = \App\ImportInfo::where([
         'id' => \Illuminate\Support\Facades\Input::get('import_id')
     ])->first();
@@ -176,6 +199,49 @@ Route::post('/detected_phone', function (){
 
 });
 
+Route::post('/detected_linkedin', function (){
+    //\Log::debug('open detected_phone');
+
+    $importInfo = \App\ImportInfo::where([
+        'id' => \Illuminate\Support\Facades\Input::get('import_id')
+    ])->first();
+
+    $path_file = 'storage/app/public/' . $importInfo->file_name;
+
+    $excelData = Maatwebsite\Excel\Facades\Excel::load($path_file, function($reader){
+        $reader->noHeading();
+    })->get()->toArray();
+
+    $header = array_shift($excelData);
+
+    foreach($excelData as $arrayData){
+        $arrayData = array_values($arrayData);
+
+        $itemLinkedin = \App\CheckLinkedin::create([
+            'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
+            'site' => $arrayData[\Illuminate\Support\Facades\Input::get('field_name')],
+            'title' => $arrayData[\Illuminate\Support\Facades\Input::get('field_title')],
+            'company_name' => $arrayData[\Illuminate\Support\Facades\Input::get('field_company_name')],
+            'provider' => 'google'
+        ]);
+
+        dispatch(
+            (new \App\Jobs\LinkedinFinder([
+                'id' => $itemLinkedin->id,
+                'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
+                'site' => $arrayData[\Illuminate\Support\Facades\Input::get('field_name')],
+                'title' => $arrayData[\Illuminate\Support\Facades\Input::get('field_title')],
+                'company_name' => $arrayData[\Illuminate\Support\Facades\Input::get('field_company_name')],
+            ]))->onQueue('linkedin')
+        );
+
+    }
+
+    return redirect('/results/linkedin/'.$importInfo->id);
+
+});
+//detected_linkedin
+
 Route::post('/create_jobs', function (Illuminate\Http\Request $request){
 
     $importInfo = \App\ImportInfo::where([
@@ -199,6 +265,46 @@ Route::post('/create_jobs', function (Illuminate\Http\Request $request){
     }
 
     return redirect('/results/'.$importInfo->id);
+});
+
+Route::get('/results/linkedin/{id}', function (Illuminate\Http\Request $request, $id){
+    $info = \App\ImportInfo::where(['id' => $id])->first();
+
+    if($info->type == 'detected_phone'){ return redirect('/results/phone/'.$id); }
+    if($info->type == 'email_checker'){ return redirect('/results/'.$id); }
+
+    $companySuccess = \App\CheckLinkedin::where('link', '!=', 'false')->where('link', '!=', '')->where(['import_id' => $id]);
+    $companyBad = \App\CheckLinkedin::where(['import_id' => $id])->where('link', '=', 'false');
+    $companyQueue = \App\CheckLinkedin::whereNull('link')->where(['import_id' => $id]);
+
+    $type_report = \Illuminate\Support\Facades\Input::get('type');
+
+    if($type_report == 'bad'){
+
+        $companyBad = $companyBad->select(['site', 'title', 'company_name', 'link'])->get();
+        return Maatwebsite\Excel\Facades\Excel::create('Bad - linkedin list ' . $info->name, function($excel) use ($companyBad){
+            $excel->sheet('Sheetname', function($sheet) use ($companyBad){
+                foreach ($companyBad as $item){
+                    $sheet->appendRow($item->toArray());
+                }
+            });
+        })->export('csv');
+
+    } elseif($type_report == 'success'){
+
+        $companySuccess = $companySuccess->select(['site', 'title', 'company_name', 'link'])->get();
+        return Maatwebsite\Excel\Facades\Excel::create('Success - linkedin list ' . $info->name, function($excel) use ($companySuccess){
+            $excel->sheet('Sheetname', function($sheet) use ($companySuccess){
+                foreach ($companySuccess as $item){
+                    $sheet->appendRow($item->toArray());
+                }
+            });
+        })->export('csv');
+
+    } else {
+        return view('report_linkedin', compact('id', 'companySuccess', 'companyBad', 'companyQueue'));
+    }
+
 });
 
 Route::get('/results/company_name/{id}', function (Illuminate\Http\Request $request, $id){
