@@ -14,6 +14,7 @@ class CheckLinkedin extends Model
         'company_name',
         'provider',
         'link',
-        'full_name'
+        'full_name',
+        'string_query'
     ];
 }

@@ -23,7 +23,7 @@ class CreateCheckLinkedinsTable extends Migration
             $table->string('title', 255);
             $table->string('company_name', 255);
             $table->string('provider', 255);
-            $table->string('full_name', 255);
+            $table->string('full_name', 255)->nullable();
             $table->string('link')->nullable();
 
             $table->timestamps();

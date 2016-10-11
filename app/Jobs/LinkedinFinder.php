@@ -39,14 +39,14 @@ class LinkedinFinder implements ShouldQueue
      */
     public function handle()
     {
-
+        $query = "site:{$this->site} AND \"{$this->title}\" AND \"{$this->company_name}\"";
         $googleClient = new \Serps\SearchEngine\Google\GoogleClient(new \Serps\HttpClient\CurlClient());
 
         $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
         $googleClient->request->setUserAgent($userAgent);
 
         $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
-        $googleUrl->setSearchTerm("site:{$this->site} AND \"{$this->title}\" AND \"{$this->company_name}\"");
+        $googleUrl->setSearchTerm($query);
 
         $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
         $response = $googleClient->query($googleUrl, $proxy);
@@ -68,7 +68,8 @@ class LinkedinFinder implements ShouldQueue
 
         \App\CheckLinkedin::where(['id' => $this->id])->update([
             'link' => $firstResult['url'],
-            'full_name' => $fullname[0]
+            'full_name' => $fullname[0],
+            'string_query' => $query
         ]);
 
     }

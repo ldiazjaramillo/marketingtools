@@ -281,7 +281,7 @@ Route::get('/results/linkedin/{id}', function (Illuminate\Http\Request $request,
 
     if($type_report == 'bad'){
 
-        $companyBad = $companyBad->select(['site', 'title', 'company_name', 'link'])->get();
+        $companyBad = $companyBad->select(['title', 'company_name', 'link', 'full_name'])->get();
         return Maatwebsite\Excel\Facades\Excel::create('Bad - linkedin list ' . $info->name, function($excel) use ($companyBad){
             $excel->sheet('Sheetname', function($sheet) use ($companyBad){
                 foreach ($companyBad as $item){
@@ -292,7 +292,7 @@ Route::get('/results/linkedin/{id}', function (Illuminate\Http\Request $request,
 
     } elseif($type_report == 'success'){
 
-        $companySuccess = $companySuccess->select(['site', 'title', 'company_name', 'link'])->get();
+        $companySuccess = $companySuccess->select(['title', 'company_name', 'link', 'full_name'])->get();
         return Maatwebsite\Excel\Facades\Excel::create('Success - linkedin list ' . $info->name, function($excel) use ($companySuccess){
             $excel->sheet('Sheetname', function($sheet) use ($companySuccess){
                 foreach ($companySuccess as $item){
