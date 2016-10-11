@@ -49,6 +49,7 @@ class GoogleEmailChecker implements ShouldQueue
 			try {
 				$email = $nameEmail . '@' . $this->domain;
 
+                $provider_name = 'google';
 				//\Log::debug('Handle GoogleEmailChecker ' . $email);
 
 				$count_result = 0;
@@ -95,9 +96,11 @@ class GoogleEmailChecker implements ShouldQueue
 					$bingClient = new Client([
 						'base_uri' => 'https://bing.com/',
 						'headers' => [
-							'User-Agent' => config('user_agent')[array_rand(config('user_agent'), 1)]
+							'User-Agent' => "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36"
 						]
 					]);
+
+                    $provider_name = 'bing';
 
 					$bingResultPage = $bingClient->get('search', [
 						'query' => [
@@ -121,7 +124,7 @@ class GoogleEmailChecker implements ShouldQueue
 			try{
 				//\Log::debug('Total results for ' . $email . ' ' . $count_result);
 
-				GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id']])->update(['count_results' => 0]);
+				GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id']])->update(['count_results' => 0, 'provider_name' => $provider_name]);
 				GoogleCheckEmail::where(['email' => $email])->update(['count_results' => $count_result]);
 
 				if ($count_result > 0) {
