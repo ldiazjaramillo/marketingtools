@@ -14,7 +14,7 @@ class AddQueryString extends Migration
     public function up()
     {
         Schema::table('check_linkedins', function (Blueprint $table) {
-            $table->string('type', 255);
+            $table->string('string_query', 255)->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddQueryString extends Migration
     public function down()
     {
         Schema::table('check_linkedins', function (Blueprint $table) {
-            $table->dropColumn('type');
+            $table->dropColumn('string_query');
         });
     }
 }
