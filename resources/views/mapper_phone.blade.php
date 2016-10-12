@@ -85,6 +85,15 @@
                     @endforeach
                 </select>
 
+                <select name="field_site">
+                    <option value="" disabled selected>Please select column with domain</option>
+                    @foreach($header as $key => $item)
+                        @if(!empty($item))
+                            <option value="{{$key}}">{{$item}}</option>
+                        @endif
+                    @endforeach
+                </select>
+
                 <select name="field_company_name">
                     <option value="" disabled selected>Please select column with company name</option>
                     @foreach($header as $key => $item)

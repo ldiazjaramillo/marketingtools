@@ -61,12 +61,8 @@ class ImportFileInBackground implements ShouldQueue
 
 				//\Log::debug('$data = array_values ' . json_encode($data));
 
-				if ($this->getTypeImport() == 'phone') {
-					$url['host'] = '';
-				} else {
-					$host = str_replace(['http://', '//', 'www.'], ['', '', ''], strtolower($data[$this->getInput('field_site')]));
-					$url = parse_url('//' . $host);
-				}
+                $host = str_replace(['http://', '//', 'www.'], ['', '', ''], strtolower($data[$this->getInput('field_site')]));
+                $url = parse_url('//' . $host);
 
 				$company_name = trim(str_replace('_', '', $data[$this->getInput('field_company_name')]));
 

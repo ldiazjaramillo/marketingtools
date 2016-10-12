@@ -12,7 +12,8 @@ class GoogleCheckPhone extends Model
 		'site',
 		'company_name',
 		'phone',
-		'data_comparasion_id'
+		'data_comparasion_id',
+        'provider_name'
 	];
 
 	public static function boot()
@@ -32,6 +33,7 @@ class GoogleCheckPhone extends Model
 				(new GooglePhoneFinder([
 					'id' => $model->id,
 					'company_name' => $model->company_name,
+                    'site' => $model->site
 				]))->onQueue('phone_finder')
 			);
 		});
