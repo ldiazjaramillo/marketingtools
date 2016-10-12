@@ -84,7 +84,7 @@ class ImportFileInBackground implements ShouldQueue
 				if (!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0) {
 					GoogleCheckPhone::create([
 						'import_id' => $dataItem->import_id,
-						'site' => (empty($url['host']) ? '' : $url['host']),
+						'site' => $url['host'],
 						'company_name' => $company_name,
 						'data_comparasion_id' => $dataItem->id
 					]);
