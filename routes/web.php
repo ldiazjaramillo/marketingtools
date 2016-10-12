@@ -360,7 +360,7 @@ Route::get('/results/phone/{id}', function (Illuminate\Http\Request $request, $i
     if($info->type == 'email_checker'){ return redirect('/results/'.$id); }
     if($info->type == 'find_company_site'){ return redirect('/results/company_name/'.$id); }
 
-    $phoneSuccess = \App\DataComparison::where('phone', '>', '0')->where(['import_id' => $id]);
+    $phoneSuccess = \App\DataComparison::where('phone', '!=', '0')->where(['import_id' => $id]);
     $phoneBad = \App\DataComparison::where(['import_id' => $id])->where('phone', '=', '0');
     $phoneQueue = \App\DataComparison::whereNull('phone')->where(['import_id' => $id]);
 
@@ -421,7 +421,7 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 
     $queue = \App\DataComparison::whereNull('score')->where(['import_id' => $id]);
 
-    $phoneSuccess = \App\GoogleCheckPhone::where('phone', '>', '0')->where(['import_id' => $id]);
+    $phoneSuccess = \App\GoogleCheckPhone::where('phone', '!=', '0')->where(['import_id' => $id]);
     $phoneBad = \App\GoogleCheckPhone::where(['import_id' => $id])->where('phone', '=', '0');
     $phoneQueue = \App\GoogleCheckPhone::whereNull('phone')->where(['import_id' => $id]);
 
