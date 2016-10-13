@@ -66,6 +66,12 @@ class LinkedinFinder implements ShouldQueue
                 $count_result = (int)$result[0];
             }
 
+            if($count_result == 0){
+                \App\CheckLinkedin::where(['id' => $this->id])->update([
+                    'link' => 'false',
+                ]);
+            }
+
             $firstResult = $response->getNaturalResults()->getItems(0)[0]->getData();
 
             $fullname = explode(' | ', $firstResult['title']);
@@ -76,11 +82,8 @@ class LinkedinFinder implements ShouldQueue
                 'string_query' => $query
             ]);
 
-        } catch (\Exception $e){
 
-            \App\CheckLinkedin::where(['id' => $this->id])->update([
-                'link' => 'false',
-            ]);
+        } catch (\Exception $e){
 
             Bugsnag::notifyException($e);
 
