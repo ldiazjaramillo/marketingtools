@@ -69,6 +69,7 @@ class LinkedinFinder implements ShouldQueue
             if($count_result == 0){
                 \App\CheckLinkedin::where(['id' => $this->id])->update([
                     'link' => 'false',
+                    'string_query' => 'Result:0 - ' . $query
                 ]);
             }
 
