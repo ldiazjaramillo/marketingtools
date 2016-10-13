@@ -20,6 +20,7 @@ class GoogleEmailChecker implements ShouldQueue
 
 	protected $name = '';
 	protected $domain = '';
+	protected $import_id = '';
 
 	/**
 	 * Create a new job instance.
@@ -31,6 +32,7 @@ class GoogleEmailChecker implements ShouldQueue
 		$this->name = $data['name'];
 		$this->domain = $data['domain'];
 		$this->data = $data;
+		$this->import_id = $data['import_id'];
 	}
 
 	/**
@@ -124,8 +126,8 @@ class GoogleEmailChecker implements ShouldQueue
 			try{
 				//\Log::debug('Total results for ' . $email . ' ' . $count_result);
 
-				GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id']])->update(['count_results' => 0, 'provider_name' => 'provider - '.$provider_name]);
-				GoogleCheckEmail::where(['email' => $email])->update(['count_results' => $count_result]);
+                GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id'], 'count_results' => NULL])->update(['count_results' => 0]);
+				GoogleCheckEmail::where(['email' => trim($email), 'import_id' => $this->import_id])->update(['count_results' => $count_result, 'provider_name' => $provider_name]);
 
 				if ($count_result > 0) {
 					DataComparison::where(['id' => $this->data['data_comparasion_id']])->update(['email' => $email, 'score' => 99.99]);

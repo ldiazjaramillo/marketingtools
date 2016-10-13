@@ -124,6 +124,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 							'name' => $importInfo->name,
 							'domain' => $domain,
 							'data_comparasion_id' => $data_id,
+                            'import_id' => $importInfo->import_id
 						]))->onQueue('email_checker_in_google')
 					);
 
@@ -150,6 +151,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                         'name' => $importInfo->name,
                         'domain' => $domain,
                         'data_comparasion_id' => $data_id,
+                        'import_id' => $importInfo->import_id
                     ]))->onQueue('email_checker_in_google')
                 );
 
@@ -172,6 +174,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                 'name' => $importInfo->name,
                 'domain' => $domain,
                 'data_comparasion_id' => $data_id,
+                'import_id' => $importInfo->import_id
             ]))->onQueue('email_checker_in_google')
         );
 
