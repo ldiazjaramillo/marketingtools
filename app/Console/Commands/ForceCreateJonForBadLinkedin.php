@@ -52,6 +52,9 @@ class ForceCreateJonForBadLinkedin extends Command
 
         foreach ($allLinkedinContact as $key => $item){
 
+            $item->link = NULL;
+            $item->save();
+
             dispatch(
                 (new \App\Jobs\LinkedinFinder([
                     'id' => $item->id,
