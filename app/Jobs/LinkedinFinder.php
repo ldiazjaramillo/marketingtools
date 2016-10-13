@@ -84,9 +84,7 @@ class LinkedinFinder implements ShouldQueue
 
 
         } catch (\Exception $e){
-
-            Bugsnag::notifyException($e);
-
+            throw new \Exception($e->getMessage(), $e->getCode());
         }
     }
 }
