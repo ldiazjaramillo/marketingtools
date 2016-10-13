@@ -76,17 +76,8 @@
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="import_id" value="{{ $importInfo->id }}">
 
-                <select name="field_name">
-                    <option value="" disabled selected>Please select column with site</option>
-                    @foreach($header as $key => $item)
-                        @if(!empty($item))
-                            <option value="{{$key}}">{{$item}}</option>
-                        @endif
-                    @endforeach
-                </select>
-
                 <select name="field_title">
-                    <option value="" disabled selected>Please select column with title</option>
+                    <option value="" disabled selected>Please select column with job title</option>
                     @foreach($header as $key => $item)
                         @if(!empty($item))
                             <option value="{{$key}}">{{$item}}</option>

@@ -219,7 +219,7 @@ Route::post('/detected_linkedin', function (){
 
         $itemLinkedin = \App\CheckLinkedin::create([
             'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
-            'site' => $arrayData[\Illuminate\Support\Facades\Input::get('field_name')],
+            'site' => 'linkedin.com/in/',//$arrayData[\Illuminate\Support\Facades\Input::get('field_name')],
             'title' => $arrayData[\Illuminate\Support\Facades\Input::get('field_title')],
             'company_name' => $arrayData[\Illuminate\Support\Facades\Input::get('field_company_name')],
             'provider' => 'google'
@@ -229,7 +229,7 @@ Route::post('/detected_linkedin', function (){
             (new \App\Jobs\LinkedinFinder([
                 'id' => $itemLinkedin->id,
                 'import_id' => \Illuminate\Support\Facades\Input::get('import_id'),
-                'site' => $arrayData[\Illuminate\Support\Facades\Input::get('field_name')],
+                'site' => 'linkedin.com/in/',//$arrayData[\Illuminate\Support\Facades\Input::get('field_name')],
                 'title' => $arrayData[\Illuminate\Support\Facades\Input::get('field_title')],
                 'company_name' => $arrayData[\Illuminate\Support\Facades\Input::get('field_company_name')],
             ]))->onQueue('linkedin')
