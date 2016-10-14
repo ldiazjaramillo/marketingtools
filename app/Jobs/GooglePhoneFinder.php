@@ -104,7 +104,7 @@ class GooglePhoneFinder implements ShouldQueue
                         'site' => $this->data['site'],
                         'google_plus' => $results['google+'],
                         'instagram' => $results['instagram'],
-                        'phone' => $results['phones'],
+                        'phones' => $results['phones'],
                         'twitter' => $results['twitter'],
                         'youtube' => $results['youtube'],
                         'linkedin' => $results['linkedin'],

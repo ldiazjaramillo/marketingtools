@@ -9,7 +9,7 @@ class InfoAboutCompany extends Model
     protected $fillable = [
         'google_plus',
         'instagram',
-        'phone',
+        'phones',
         'twitter',
         'youtube',
         'linkedin',
@@ -17,6 +17,6 @@ class InfoAboutCompany extends Model
     ];
 
     protected $casts = [
-        'phone' => 'json',
+        'phones' => 'json',
     ];
 }
