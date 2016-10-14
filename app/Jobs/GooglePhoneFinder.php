@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DataComparison;
 use App\GoogleCheckPhone;
+use App\InfoAboutCompany;
 use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -45,36 +46,56 @@ class GooglePhoneFinder implements ShouldQueue
 
             try {
 
-                $providerName = 'privat_service';
 
-                $client = new Client([
-                    'base_uri' => env('SERVICE_PHONE_AND_SOCIAL', 'http://104.131.10.69:5000')
-                ]);
+                $infoFromCache = InfoAboutCompany::where(['site' => $this->data['site']])->first();
 
-                $results = $client->get('find_phones', [
-                    'query' => [
-                        'url' => 'http://'.$this->data['site']
-                    ]
-                ])->getBody()->getContents();
+                if(!is_null($infoFromCache)){
+                    $providerName = 'cache_table';
 
+                    $phones = (array) $infoFromCache->phone;
+                    $number = $phones[0];
 
-                $results = json_decode($results, 1);
+                    $infoFromCache->count_request = ($infoFromCache->count_request + 1);
+                    $infoFromCache->save();
 
-                if (isset($results['phones'])) {
-                    $number = array_first($results['phones']);
                 } else {
-                    $number = array_first($results);
-                }
+                    $providerName = 'privat_service';
 
-                var_dump($this->data['id']);
-                var_dump($number);
+                    $client = new Client([
+                        'base_uri' => env('SERVICE_PHONE_AND_SOCIAL', 'http://104.131.10.69:5000')
+                    ]);
 
-                if(empty($number)){
-                    throw new \Exception('Empty results from private service');
+                    $results = $client->get('find_phones', [
+                        'query' => [
+                            'url' => 'http://'.$this->data['site']
+                        ]
+                    ])->getBody()->getContents();
+
+
+                    $results = json_decode($results, 1);
+
+                    if (isset($results['phones'])) {
+                        $number = array_first($results['phones']);
+                    } else {
+                        $number = array_first($results);
+                    }
+
+                    if(empty($number)){
+                        throw new \Exception('Empty results from private service');
+                    }
+
+                    InfoAboutCompany::create([
+                        'google_plus' => $results['google+'],
+                        'instagram' => $results['instagram'],
+                        'phone' => $results['phones'],
+                        'twitter' => $results['twitter'],
+                        'youtube' => $results['youtube'],
+                        'linkedin' => $results['linkedin'],
+                        'facebook' => $results['facebook']
+                    ]);
                 }
 
             } catch (\Exception $e) {
-                var_dump($e->getMessage());
 
                 Bugsnag::notifyException($e);
 
