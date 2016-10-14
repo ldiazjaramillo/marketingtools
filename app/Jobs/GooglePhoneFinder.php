@@ -74,6 +74,7 @@ class GooglePhoneFinder implements ShouldQueue
                 }
 
             } catch (\Exception $e) {
+                var_dump($e->getMessage());
 
                 Bugsnag::notifyException($e);
 
