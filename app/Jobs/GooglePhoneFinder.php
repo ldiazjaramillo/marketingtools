@@ -95,7 +95,7 @@ class GooglePhoneFinder implements ShouldQueue
                         'facebook' => $results['facebook']
                     ]);
 
-                    InfoAboutCompany::create([
+                    $result = InfoAboutCompany::create([
                         'site' => $this->data['site'],
                         'google_plus' => $results['google+'],
                         'instagram' => $results['instagram'],
@@ -105,6 +105,8 @@ class GooglePhoneFinder implements ShouldQueue
                         'linkedin' => $results['linkedin'],
                         'facebook' => $results['facebook']
                     ]);
+
+                    var_dump($result);
                 }
 
             } catch (\Exception $e) {
