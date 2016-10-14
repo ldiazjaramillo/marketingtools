@@ -84,17 +84,6 @@ class GooglePhoneFinder implements ShouldQueue
                         throw new \Exception('Empty results from private service');
                     }
 
-                    var_dump([
-                        'site' => $this->data['site'],
-                        'google_plus' => $results['google+'],
-                        'instagram' => $results['instagram'],
-                        'phones' => $results['phones'],
-                        'twitter' => $results['twitter'],
-                        'youtube' => $results['youtube'],
-                        'linkedin' => $results['linkedin'],
-                        'facebook' => $results['facebook']
-                    ]);
-
                     $newInfo = new InfoAboutCompany();
                     $newInfo->site = $this->data['site'];
                     $newInfo->google_plus = $results['google+'];
