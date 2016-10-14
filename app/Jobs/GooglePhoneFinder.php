@@ -58,7 +58,7 @@ class GooglePhoneFinder implements ShouldQueue
                 ])->getBody()->getContents();
 
 
-                $results = \GuzzleHttp\json_decode($results);
+                $results = json_decode($results, 1);
 
                 if (isset($results['phones'])) {
                     $number = array_first($results['phones']);
