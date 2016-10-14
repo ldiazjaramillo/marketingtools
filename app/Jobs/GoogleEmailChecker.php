@@ -52,7 +52,7 @@ class GoogleEmailChecker implements ShouldQueue
 		    $email = $nameEmail . '@' . $this->domain;
             $count_result = 0;
 
-		    try {
+
 
                 $provider_name = 'google';
 				//\Log::debug('Handle GoogleEmailChecker ' . $email);
@@ -78,49 +78,6 @@ class GoogleEmailChecker implements ShouldQueue
 					preg_match("/[0-9,]+/", $result_string, $result);
 					$count_result = (int)$result[0];
 				}
-
-			} catch (\Exception $e) {
-
-				Bugsnag::notifyException($e);
-
-				//\Log::debug('Exception GoogleEmailChecker');
-
-				/*\Log::debug(json_encode([
-					'file' => $e->getFile(),
-					'line' => $e->getLine(),
-					'message' => $e->getMessage(),
-				]));*/
-
-
-				//\Log::debug('Start find email ' . $email . ' in Bing');
-
-				try {
-					$bingClient = new Client([
-						'base_uri' => 'https://bing.com/',
-						'headers' => [
-							'User-Agent' => "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36"
-						]
-					]);
-
-                    $provider_name = 'bing';
-
-					$bingResultPage = $bingClient->get('search', [
-						'query' => [
-							'q' => '"' . $email . '"'
-						],
-						'proxy' => [
-							'http' => 'tcp://' . env('PROXY_HOST', '37.48.118.90') . ':' . env('PROXY_PORT', '13012')
-						]
-					])->getBody()->getContents();
-
-					$isResultBing = (!(bool)strpos($bingResultPage, 'class="b_no"'));
-
-					$count_result = ($isResultBing) ? 1 : 0;
-				} catch (\Exception $e) {
-					Bugsnag::notifyException($e);
-				}
-
-			}
 
 
 			try{
