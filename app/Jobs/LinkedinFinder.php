@@ -85,7 +85,7 @@ class LinkedinFinder implements ShouldQueue
 
 
         } catch (\Exception $e){
-            throw new \Exception($e->getMessage(), $e->getCode());
+            throw new \Exception($e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine());
         }
     }
 }

@@ -113,7 +113,7 @@ class GooglePhoneFinder implements ShouldQueue
 
             Bugsnag::notifyException($e);
 
-            throw new \Exception('failed phone detected');
+            throw new \Exception($e->getMessage().' ' .$e->getFile() . ':' . $e->getLine(), $e->getCode());
 
         }
 
