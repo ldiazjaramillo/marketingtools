@@ -18,7 +18,7 @@ class CreateInfoAboutCompaniesTable extends Migration
             $table->string('site', 255)->index();
             $table->string('google_plus', 255)->nullable()->index();
             $table->string('instagram', 255)->nullable()->index();
-            $table->text('phones')->nullable()->index();
+            $table->text('phones')->nullable();
             $table->string('twitter', 255)->nullable()->index();
             $table->string('youtube', 255)->nullable()->index();
             $table->string('linkedin', 255)->nullable()->index();
