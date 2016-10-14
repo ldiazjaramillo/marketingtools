@@ -85,6 +85,7 @@ class GooglePhoneFinder implements ShouldQueue
                     }
 
                     InfoAboutCompany::create([
+                        'site' => $this->data['site'],
                         'google_plus' => $results['google+'],
                         'instagram' => $results['instagram'],
                         'phone' => $results['phones'],
