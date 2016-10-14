@@ -66,8 +66,11 @@ class GooglePhoneFinder implements ShouldQueue
                     $number = array_first($results);
                 }
 
+                var_dump($this->data['id']);
+                var_dump($number);
+
                 if(empty($number)){
-                    throw new \Exception('Empty results from provate service');
+                    throw new \Exception('Empty results from private service');
                 }
 
             } catch (\Exception $e) {
