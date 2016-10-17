@@ -82,10 +82,6 @@ class ForseCreateJobForCheckingEmailsInSearchEngine extends Command
             }
 
         } catch (\Exception $e){
-            print_r($e->getFile());
-            print_r($e->getLine());
-            print_r($e->getMessage());
-            die;
             Bugsnag::notifyException($e);
         }
 
