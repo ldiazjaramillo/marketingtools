@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Serps\Core\Http\Proxy;
 
 class LinkedinSearchFromGoogle implements ShouldQueue
 {
