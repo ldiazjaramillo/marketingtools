@@ -205,7 +205,7 @@
                                                     <a href="/lists_linkedin/{{$itemGoogle['id']}}" target="_blank">{{$itemGoogle['request']}}</a>
                                                 </td>
                                                 <td>
-                                                    {{$itemGoogle['total_results']}}
+                                                    {{$itemGoogle['page']}}
                                                 </td>
                                             </tr>
                                         @endforeach
