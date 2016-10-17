@@ -45,6 +45,13 @@ Route::get('/lists_linkedin/{id}', function ($id){
         ])->get();
         return Maatwebsite\Excel\Facades\Excel::create('Success - linkedin list ' . $id, function($excel) use ($companySuccess){
             $excel->sheet('Sheetname', function($sheet) use ($companySuccess){
+                $sheet->appendRow([
+                    'name',
+                    'job title',
+                    'company name',
+                    'linkedin profile',
+                    'snippet from google'
+                ]);
                 foreach ($companySuccess as $item){
                     $sheet->appendRow($item->toArray());
                 }
