@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Jobs\PushEmailForCheckingScore;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,33 +40,37 @@ class DataComparison extends Model
 
 
 		$formatEmail = FormatEmailForDomain::where(['domain' => $domain]);
-		
-		if($formatEmail->count() == 1){
 
-			$formatEmail = $formatEmail->first();
+        try {
+            if($formatEmail->count() == 1){
 
-			$allVariantEmailName = array_merge([$formatEmail->getNameFromTemplate($firstname, $lastname)], $allVariantEmailName);
-		} else {
+                $formatEmail = $formatEmail->first();
 
-			$clientEmailBreaker = new Client(['base_uri' => 'http://www.emailbreaker.com/a/search/']);
+                $allVariantEmailName = array_merge([$formatEmail->getNameFromTemplate($firstname, $lastname)], $allVariantEmailName);
+            } else {
 
-			$result = trim($clientEmailBreaker->get($domain, [
-				'proxy' => [
-					'http'  => 'tcp://' . env('PROXY_HOST', '37.48.118.90') . ':' . env('PROXY_PORT', '13012')
-				]
-			])->getBody()->getContents());
+                $clientEmailBreaker = new Client(['base_uri' => 'http://www.emailbreaker.com/a/search/']);
 
-			if($result == 'null'){
-				//var_dump($result);
-			} else {
-				$result = json_decode($result, 1);
-				$suggestion = array_first($result)['format'];
-				list($template, $domain) = explode('@', $suggestion);
-				$suggestionTemplate = FormatEmailForDomain::detectedTypeEmail($template, $domain, $firstname, $lastname, 'emailbreaker.com');
-				$allVariantEmailName = array_merge($suggestionTemplate, $allVariantEmailName);
-			}
+                $result = trim($clientEmailBreaker->get($domain, [
+                    'proxy' => [
+                        'http'  => 'tcp://' . env('PROXY_HOST', '37.48.118.90') . ':' . env('PROXY_PORT', '13012')
+                    ]
+                ])->getBody()->getContents());
 
-		}
+                if($result == 'null'){
+                    //var_dump($result);
+                } else {
+                    $result = json_decode($result, 1);
+                    $suggestion = array_first($result)['format'];
+                    list($template, $domain) = explode('@', $suggestion);
+                    $suggestionTemplate = FormatEmailForDomain::detectedTypeEmail($template, $domain, $firstname, $lastname, 'emailbreaker.com');
+                    $allVariantEmailName = array_merge($suggestionTemplate, $allVariantEmailName);
+                }
+
+            }
+        } catch (\Exception $e){
+            Bugsnag::notifyException($e);
+        }
 
 		$allVariantEmailName = array_unique($allVariantEmailName);
 
