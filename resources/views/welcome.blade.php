@@ -197,20 +197,20 @@
                                     <input type="submit" id="submit" value="New search"/>
                                 </form>
 
-                                {{--<div style="height: 300px; overflow-y: scroll;">
+                                <div style="height: 300px; overflow-y: scroll;">
                                     <table>
-                                        @foreach($linkedin as $item)
+                                        @foreach($linkedinGoogle as $itemGoogle)
                                             <tr>
                                                 <td>
-                                                    <a href="/results/linkedin/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                    <a href="/lists_linkedin/{{$itemGoogle['id']}}" target="_blank">{{$itemGoogle['request']}}</a>
                                                 </td>
                                                 <td>
-                                                    {{$item['total_row']}}
+                                                    {{$itemGoogle['total_results']}}
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </table>
-                                </div>--}}
+                                </div>
 
                             </div>
                         </td>

@@ -22,8 +22,9 @@ Route::get('/', function () {
     $detected_phone = \App\ImportInfo::where(['type' => 'detected_phone'])->get()->sortByDesc('id')->toArray();
     $detected_email = \App\ImportInfo::where(['type' => 'email_checker'])->get()->sortByDesc('id')->toArray();
     $linkedin = \App\ImportInfo::where(['type' => 'linkedin'])->get()->sortByDesc('id')->toArray();
+    $linkedinGoogle = \App\LinkedinParserSession::all()->toArray();
 
-    return view('welcome', compact('site_company', 'detected_phone', 'detected_email', 'linkedin'));
+    return view('welcome', compact('site_company', 'detected_phone', 'detected_email', 'linkedin', 'linkedinGoogle'));
 });
 
 Route::post('/mapping_linkedin', function (Illuminate\Http\Request $request) {
