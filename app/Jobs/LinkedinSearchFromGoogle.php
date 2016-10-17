@@ -46,7 +46,8 @@ class LinkedinSearchFromGoogle implements ShouldQueue
             $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
             $googleUrl->setSearchTerm('site:linkedin.com/in/ AND '.$this->query)->setPage($this->page);
 
-            $response = $googleClient->query($googleUrl);
+            $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
+            $response = $googleClient->query($googleUrl, $proxy);
 
             $resultObject = $response->getDom()->getElementById('resultStats');
 
