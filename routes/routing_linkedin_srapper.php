@@ -43,6 +43,7 @@ Route::get('/lists_linkedin/{id}', function ($id){
             'link',
             'string_linkedin'
         ])->get();
+
         return Maatwebsite\Excel\Facades\Excel::create('Success - linkedin list ' . $id, function($excel) use ($companySuccess){
             $excel->sheet('Sheetname', function($sheet) use ($companySuccess){
                 $sheet->appendRow([
@@ -52,8 +53,26 @@ Route::get('/lists_linkedin/{id}', function ($id){
                     'linkedin profile',
                     'snippet from google'
                 ]);
+
                 foreach ($companySuccess as $item){
-                    $sheet->appendRow($item->toArray());
+
+                    $item = $item->toArray();
+
+                    try {
+                        $snippet = $item['string_linkedin'];
+                        $snippet = explode(' - ', $snippet);
+
+                        $tmpSnippet = explode(' at ', $snippet[1]);
+
+                        $item['title'] = $tmpSnippet[0];
+                        $item['company_name'] = $tmpSnippet[1];
+
+                    } catch (Exception $e){
+                        $item['title'] = '';
+                        $item['company_name'] = '';
+                    }
+
+                    $sheet->appendRow($item);
                 }
             });
         })->export('csv');
