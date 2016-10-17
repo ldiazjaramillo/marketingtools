@@ -46,8 +46,11 @@ class ForseCreateJobForCheckingEmailsInSearchEngine extends Command
 
             $import_id = $this->argument('import_id');
 
-            $allDataComparison = DataComparison::where(['import_id' => $import_id, 'email' => 0])->select(['id', 'name', 'site', 'import_id'])->get();
+            $inQueue = \App\GoogleCheckEmail::whereNull('count_results')->where(['import_id' => $import_id]);
+            $this->info('Remove from queue' . $inQueue->count());
+            $inQueue->delete();
 
+            $allDataComparison = DataComparison::where(['import_id' => $import_id, 'email' => 0])->select(['id', 'name', 'site', 'import_id'])->get();
 
             $this->info('Start push in queue. Total ' . count($allDataComparison));
 
@@ -69,16 +72,20 @@ class ForseCreateJobForCheckingEmailsInSearchEngine extends Command
                     (new GoogleEmailChecker([
                         'name' => $itemData->name,
                         'domain' => $itemData->site,
+                        'import_id' => $itemData->import_id,
                         'data_comparasion_id' => $itemData->id,
                     ]))->onQueue('email_checker_in_google')
                 );
 
                 $bar->advance();
-                unset($allDataComparison[$key]);
-
+                //unset($allDataComparison[$key]);
             }
 
         } catch (\Exception $e){
+            print_r($e->getFile());
+            print_r($e->getLine());
+            print_r($e->getMessage());
+            die;
             Bugsnag::notifyException($e);
         }
 

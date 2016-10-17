@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ForseCreateJobForCheckingEmails::class,
         \App\Console\Commands\ForseCreateJobForCheckingEmailsInSearchEngine::class,
         \App\Console\Commands\ForceCreateJonForBadLinkedin::class,
+        \App\Console\Commands\ForceCreateJobForCheckingPhone::class,
         \Bugsnag\BugsnagLaravel\Commands\DeployCommand::class,
     ];
 
