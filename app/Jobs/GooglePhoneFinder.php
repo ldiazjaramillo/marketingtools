@@ -44,7 +44,7 @@ class GooglePhoneFinder implements ShouldQueue
         $googleClient = new \Serps\SearchEngine\Google\GoogleClient(new \Serps\HttpClient\CurlClient());
         try{
 
-            try {
+/*            try {
 
 
                 $infoFromCache = InfoAboutCompany::where(['site' => $this->data['site']])->first();
@@ -126,6 +126,30 @@ class GooglePhoneFinder implements ShouldQueue
                     $number = 0;
                 }
 
+            }*/
+
+            $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
+
+            $googleClient->request->setUserAgent($userAgent);
+            $providerName = 'google';
+
+            $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
+
+            //\Log::debug('Search phone in Google "' . $this->data['company_name'] . ' phone number' . '"');
+
+            $googleUrl->setSearchTerm($this->data['company_name'] . ' phone number');
+
+            $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
+            $response = $googleClient->query($googleUrl, $proxy);
+
+            $blockWithPhone = $response->cssQuery('._RCm');
+
+            if(!empty($blockWithPhone->length)){
+                $str = $response->cssQuery('._RCm')->item(0)->parentNode->textContent;
+                preg_match_all('!\d+!', $str, $matches);
+                $number = implode('', $matches[0]);
+            } else {
+                $number = 0;
             }
 
             $checkFone = GoogleCheckPhone::where(['id' => $this->data['id']])->first();
