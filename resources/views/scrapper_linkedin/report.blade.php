@@ -73,7 +73,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <h2>{{$linkedin->total_results}}</h2>
+                        <h2>{{$linkedin->page}}</h2>
                         <a href="?type=success" target="_blank">download</a>
                     </td>
                 </tr>

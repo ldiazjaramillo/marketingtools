@@ -45,7 +45,7 @@ class LinkedinSearchFromGoogle implements ShouldQueue
             $googleClient->request->setUserAgent($userAgent);
 
             $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
-            $googleUrl->setSearchTerm('site:linkedin.com/in/ AND '.$this->query)->setPage($this->page);
+            $googleUrl->setSearchTerm('site:linkedin.com/in/ AND '.$this->query)->setPage($this->page)->setResultsPerPage(20);
 
             $proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
             $response = $googleClient->query($googleUrl, $proxy);
@@ -54,24 +54,46 @@ class LinkedinSearchFromGoogle implements ShouldQueue
 
             $results = $response->getNaturalResults();
 
+            $count_result = 0;
+
+            if (!empty($resultObject->firstChild->data)) {
+                $result_string = $resultObject->firstChild->data;
+                $result_string = str_replace([' ', ' '], ['', ''], $result_string);
+                preg_match("/[0-9,]+/", $result_string, $result);
+                $count_result = (int)$result[0];
+            }
+
+            $parserSession = LinkedinParserSession::where([
+                'id' => $this->id,
+                'total_results' => 0
+            ])->update(['total_results' => $count_result]);
+
             $i = 0;
+
+            if(count($results) == 0){
+                return true;
+            }
+
             foreach($results as $itemResult){
                 $itemResult = $itemResult->getData();
                 $fullname = explode(' | ', $itemResult['title']);
 
+
+
                 try {
                     $descriptionJob = $response->cssQuery('.slp')->item($i)->textContent;
-                    $tmpJob = explode(' - ', $descriptionJob);
-                    if(count($tmpJob) == 2){
-                        $title = $tmpJob[0];
-                        $company_name = $tmpJob[1];
-                    } elseif(count($tmpJob) > 2){
-                        $title = $tmpJob[1];
-                        $company_name = $tmpJob[2];
-                    }
+                    $snippet = preg_replace('%[^A-Za-z0-9- ,.]%', '', $descriptionJob);
+
+                    $snippet = explode(' - ', $snippet);
+
+                    $tmpSnippet = explode(' at ', $snippet[1]);
+
+                    $title = $tmpSnippet[0];
+                    $company_name = $tmpSnippet[1];
                 } catch (\Exception $e){
                     $title = '';
                     $company_name = '';
+                    $descriptionJob = '';
                 }
 
                 LinkedinFromGoogle::create([
@@ -92,11 +114,12 @@ class LinkedinSearchFromGoogle implements ShouldQueue
                 'id' => $this->id
             ])->first();
 
-            $parserSession->total_results = $parserSession->total_results + count($results);
+            $parserSession->page = $parserSession->page + count($results);
             $parserSession->save();
 
         } catch (\Exception $e){
             var_dump($e->getMessage());
+            var_dump($e->getFile());
             var_dump($e->getLine());
             var_dump($e->getCode());
             var_dump('$e->getCode()');

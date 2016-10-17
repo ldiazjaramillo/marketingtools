@@ -13,7 +13,7 @@ Route::post('/create_new_session', function (Illuminate\Http\Request $request){
         'request' => $request->input('request_name'),
     ]);
 
-    for($i = 0; $i<=100; $i++){
+    for($i = 0; $i<=50; $i++){
         dispatch(
             (new LinkedinSearchFromGoogle($linkedinTask->id, $linkedinTask->request, $i))->onQueue('linkedin_search')
         );
@@ -59,7 +59,8 @@ Route::get('/lists_linkedin/{id}', function ($id){
                     $item = $item->toArray();
 
                     try {
-                        $snippet = $item['string_linkedin'];
+                        $snippet = preg_replace('%[^A-Za-z0-9- ,.]%', '', $item['string_linkedin']);
+
                         $snippet = explode(' - ', $snippet);
 
                         $tmpSnippet = explode(' at ', $snippet[1]);
