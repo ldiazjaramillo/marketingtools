@@ -68,7 +68,7 @@
             <div class="content">
                 <table>
                     <tr>
-                        <td>
+                        <td width="30%">
                             <div class="title m-b-md">Email checker</div>
 
                             <div class="links">
@@ -95,8 +95,8 @@
                                 </div>
                             </div>
                         </td>
-                        <td width="100px"></td>
-                        <td>
+                        <td width="5%"></td>
+                        <td width="30%">
                             <div class="title m-b-md">Find phone</div>
 
                             <div class="links">
@@ -125,8 +125,8 @@
 
                             </div>
                         </td>
-                        <td width="100px"></td>
-                        <td>
+                        <td width="5%"></td>
+                        <td width="30%">
                             <div class="title m-b-md">Find a site company</div>
 
                             <div class="links">
@@ -158,7 +158,7 @@
                     </tr>
 
                     <tr>
-                        <td colspan="5">
+                        <td width="30%">
                             <div class="title m-b-md">Find a linkedin profile</div>
 
                             <div class="links">
@@ -186,8 +186,36 @@
                                 </div>
 
                             </div>
-
                         </td>
+                        <td width="5%"></td>
+                        <td width="30%">
+                            <div class="title m-b-md">Search new contact</div>
+
+                            <div class="links">
+                                <form action="/scrapper_contact_linkedin" method="POST">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="submit" id="submit" value="New search"/>
+                                </form>
+
+                                {{--<div style="height: 300px; overflow-y: scroll;">
+                                    <table>
+                                        @foreach($linkedin as $item)
+                                            <tr>
+                                                <td>
+                                                    <a href="/results/linkedin/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
+                                </div>--}}
+
+                            </div>
+                        </td>
+                        <td width="5%"></td>
+                        <td width="30%"></td>
                     </tr>
 
                 </table>

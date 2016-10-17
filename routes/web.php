@@ -506,3 +506,5 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
     }
 
 });
+//scrapper_contact_linkedin
+require_once 'routing_linkedin_srapper.php';
