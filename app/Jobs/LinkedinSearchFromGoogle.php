@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\LinkedinFromGoogle;
 use App\LinkedinParserSession;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -118,6 +119,7 @@ class LinkedinSearchFromGoogle implements ShouldQueue
             $parserSession->save();
 
         } catch (\Exception $e){
+            Bugsnag::notifyException($e);
             var_dump($e->getMessage());
             var_dump($e->getFile());
             var_dump($e->getLine());
