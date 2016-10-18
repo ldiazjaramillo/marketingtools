@@ -7,19 +7,29 @@ Route::post('/scrapper_contact_linkedin', function (Illuminate\Http\Request $req
 });
 
 Route::post('/create_new_session', function (Illuminate\Http\Request $request){
-    $requestString = $request->input('request_name');
 
-    $linkedinTask = \App\LinkedinParserSession::create([
-        'request' => $request->input('request_name'),
-    ]);
+    $file = $request->file('import');
 
-    for($i = 0; $i<=50; $i++){
-        dispatch(
-            (new LinkedinSearchFromGoogle($linkedinTask->id, $linkedinTask->request, $i))->onQueue('linkedin_search')
-        );
+    $file->storeAs('/public/', $file->getFilename());
+
+
+    $excel = Maatwebsite\Excel\Facades\Excel::load($file->getRealPath())->get()->toArray();
+
+    foreach($excel[0] as $stringQuery){
+        $stringQuery = array_values($stringQuery);
+
+        $linkedinTask = \App\LinkedinParserSession::create([
+            'request' => $stringQuery[0],
+        ]);
+
+        for($i = 0; $i<=50; $i++){
+            dispatch(
+                (new LinkedinSearchFromGoogle($linkedinTask->id, $linkedinTask->request, $i))->onQueue('linkedin_search')
+            );
+        }
     }
 
-    return redirect('/lists_linkedin/'.$linkedinTask->id);
+    return redirect('/');
 });
 
 Route::get('/lists_linkedin/{id}', function ($id){

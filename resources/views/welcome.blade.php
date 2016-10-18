@@ -192,9 +192,10 @@
                             <div class="title m-b-md">Search new contact</div>
 
                             <div class="links">
-                                <form action="/scrapper_contact_linkedin" method="POST">
+                                <form action="/create_new_session" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <input type="submit" id="submit" value="New search"/>
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
                                 </form>
 
                                 <div style="height: 300px; overflow-y: scroll;">
