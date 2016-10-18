@@ -11,10 +11,10 @@ Route::post('/create_new_session', function (Illuminate\Http\Request $request){
     $file = $request->file('import');
 
     $file->storeAs('/public/', $file->getFilename());
-    
+
     $excel = Maatwebsite\Excel\Facades\Excel::load($file->getRealPath())->get()->toArray();
 
-    foreach($excel[0] as $stringQuery){
+    foreach($excel as $stringQuery){
 
         if(is_array($stringQuery)){
             $stringQuery = array_values($stringQuery);
