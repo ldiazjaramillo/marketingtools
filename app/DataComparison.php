@@ -82,7 +82,7 @@ class DataComparison extends Model
 		parent::boot();
 
 		static::updated(function($model){
-			\Log::debug('Update DataComparison ' . json_encode($model));
+			//\Log::debug('Update DataComparison ' . json_encode($model));
 		});
 
 		static::created(function ($model) {

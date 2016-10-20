@@ -73,7 +73,7 @@ class CheckPhoneInGoogle extends Command
 
             $googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
 
-            \Log::debug('Search phone in Google "' . $company_name . ' phone number' . '"');
+            //\Log::debug('Search phone in Google "' . $company_name . ' phone number' . '"');
 
             $googleUrl->setSearchTerm($company_name . ' phone number');
 
@@ -91,7 +91,7 @@ class CheckPhoneInGoogle extends Command
                 $number = 0;
             }
 
-            \Log::debug('Results in Google ' . $number . ' for ' . $company_name);
+            //\Log::debug('Results in Google ' . $number . ' for ' . $company_name);
         }
 
 
