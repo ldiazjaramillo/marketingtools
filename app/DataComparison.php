@@ -87,7 +87,7 @@ class DataComparison extends Model
 
 		static::created(function ($model) {
 
-			\Log::info('Create new DataComparison ' . $model->id . ' ' . json_encode($model));
+			//\Log::info('Create new DataComparison ' . $model->id . ' ' . json_encode($model));
 
 			if(empty($model->site)){
 				$model->email = false;

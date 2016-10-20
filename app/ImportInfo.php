@@ -12,7 +12,7 @@ class ImportInfo extends Model
 	{
 		parent::boot();
 		static::created(function ($model) {
-			\Log::info('Create new ImportInfo ' . $model->id . ' ' . json_encode($model));
+			//\Log::info('Create new ImportInfo ' . $model->id . ' ' . json_encode($model));
 		});
 	}
 
