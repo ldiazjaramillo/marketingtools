@@ -46,6 +46,10 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             $variableName = \App\DataComparison::getVariableEmailName($name, $domain);
 
+
+            if($variableName == 'finish'){
+                return true;
+            }
             //\Log::info('Run PushEmailForCheckingScore ' . json_encode($variableName));
 
             $result = [];

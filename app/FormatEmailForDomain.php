@@ -88,12 +88,72 @@ class FormatEmailForDomain extends Model
 			],
 			'Firstname_Lastname' => [
 				'name' => $firstname.'_'.$lastname,
-				'template_id' => 'firstName'
+				'template_id' => 'Firstname_Lastname'
 			],
 			'Lastname'  => [
 				'name' => $lastname,
 				'template_id' => 'lastName'
-			]
+			],
+            'first_name' => [
+                'name' => $firstname,
+                'template_id' => 'firstName'
+            ],
+            'last_name' => [
+                'name' => $lastname,
+                'template_id' => 'lastName'
+            ],
+            'first_initiallast_name' => [
+                'name' => $firstname[0].$lastname,
+                'template_id' => 'firstInitial_lastName'
+            ],
+            'first_name_last_name' => [
+                'name' => $firstname.'_'.$lastname,
+                'template_id' => 'Firstname_Lastname'
+            ],
+            'first_name.last_name' => [
+                'name' => $firstname.'.'.$lastname,
+                'template_id' => 'firstName_dot_lastName'
+            ],
+            'FirstInitial' => [
+                'name' => $firstname[0],
+                'template_id' => 'FirstInitial'
+            ],
+            'FirstInitial_dot_Lastname' => [
+                'name' => $firstname[0].'.'.$lastname,
+                'template_id' => 'FirstInitial_dot_Lastname'
+            ],
+            'Firstname_dot_LastInitial' => [
+                'name' => $firstname.'.'.$lastname[0],
+                'template_id' => 'Firstname_dot_LastInitial'
+            ],
+            'FirstnameLastInitial' => [
+                'name' => $firstname.$lastname[0],
+                'template_id' => 'FirstnameLastInitial'
+            ],
+            'FirstnameLastname' => [
+                'name' => $firstname.$lastname,
+                'template_id' => 'FirstnameLastname'
+            ],
+            'Lastname_Firstname' => [
+                'name' => $lastname.'_'.$firstname,
+                'template_id' => 'Lastname_Firstname'
+            ],
+            'Lastname_dot_FirstInitial' => [
+                'name' => $lastname.'.'.$firstname[0],
+                'template_id' => 'Lastname_dot_FirstInitial'
+            ],
+            'LastnameFirstInitial' => [
+                'name' => $lastname.$firstname[0],
+                'template_id' => 'LastnameFirstInitial'
+            ],
+            'first_namelast_name' => [
+                'name' => $firstname.$lastname,
+                'template_id' => 'FirstnameLastname'
+            ],
+            'last_namefirst_initial' => [
+                'name' => $lastname.$firstname[0],
+                'template_id' => 'LastnameFirstInitial'
+            ]
 		];
 
 		$extraQuerty = ['note' => $name];
