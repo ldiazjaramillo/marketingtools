@@ -89,7 +89,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                         $emails[] = $email;
                     }
 
-                    if ($request['catch_all'] == false && $score > 64) {
+                    if ($request['catch_all'] == false && $score >= 85) {
 
                         $keys = array_keys($result);
 
