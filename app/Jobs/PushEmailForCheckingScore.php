@@ -106,7 +106,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
                         return true;
 
-                    } elseif ($request['catch_all'] == true) {
+                    } elseif ($request['catch_all'] == true || $score < 85) {
 
                         //Log::warning('Catch all for ' . $email . ' score ' . $score);
 
