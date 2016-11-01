@@ -75,13 +75,21 @@ class ImportFileInBackground implements ShouldQueue
 					'row_data' => $data,
 				];
 
-				if ($this->getTypeImport() == 'phone') {
-					$dataComparation['email'] = '0';
-				}
+                if ($this->getTypeImport() == 'phone') {
+                    $dataComparation['email'] = '0';
+                }
+
+                if ($this->getTypeImport() == 'only_email') {
+                    $dataComparation['phone'] = '0';
+                }
 
 				$dataItem = \App\DataComparison::create($dataComparation);
 
-				if (!empty($company_name) && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0) {
+				if (
+				    !empty($company_name)
+                    && GoogleCheckPhone::where(['company_name' => $company_name, 'import_id' => $dataItem->import_id])->count() == 0
+                    && $this->getTypeImport() != 'only_email'
+                ) {
 					GoogleCheckPhone::create([
 						'import_id' => $dataItem->import_id,
 						'site' => $url['host'],

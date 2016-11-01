@@ -21,10 +21,11 @@ Route::get('/', function () {
     $site_company = \App\ImportInfo::where(['type' => 'find_company_site'])->get()->sortByDesc('id')->toArray();
     $detected_phone = \App\ImportInfo::where(['type' => 'detected_phone'])->get()->sortByDesc('id')->toArray();
     $detected_email = \App\ImportInfo::where(['type' => 'email_checker'])->get()->sortByDesc('id')->toArray();
+    $only_detected_email = \App\ImportInfo::where(['type' => 'only_email_checker'])->get()->sortByDesc('id')->toArray();
     $linkedin = \App\ImportInfo::where(['type' => 'linkedin'])->get()->sortByDesc('id')->toArray();
     $linkedinGoogle = \App\LinkedinParserSession::all()->toArray();
 
-    return view('welcome', compact('site_company', 'detected_phone', 'detected_email', 'linkedin', 'linkedinGoogle'));
+    return view('welcome', compact('site_company', 'detected_phone', 'detected_email', 'linkedin', 'linkedinGoogle', 'only_detected_email'));
 });
 
 Route::post('/mapping_linkedin', function (Illuminate\Http\Request $request) {
@@ -509,3 +510,4 @@ Route::get('/results/{id}', function (Illuminate\Http\Request $request, $id){
 });
 //scrapper_contact_linkedin
 require_once 'routing_linkedin_srapper.php';
+require_once 'routing_email_srapper.php';

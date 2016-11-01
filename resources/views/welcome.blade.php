@@ -69,7 +69,37 @@
                 <table>
                     <tr>
                         <td width="30%">
-                            <div class="title m-b-md">Email checker</div>
+                            <div class="title m-b-md">Find email</div>
+
+                            <div class="links">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping_email" enctype="multipart/form-data">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="phone" value="true">
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
+                                    <p>Will check only email!</p>
+                                </form>
+
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <table>
+                                        @foreach($only_detected_email as $item)
+                                            <tr>
+                                                <td>
+                                                    <a href="/results_email/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
+                                </div>
+
+                            </div>
+                        </td>
+                        <td width="5%"></td>
+                        <td width="30%">
+                            <div class="title m-b-md">Email and phone checker</div>
 
                             <div class="links">
                                 <form class="form-horizontal" role="form" method="POST" action="/mapping" enctype="multipart/form-data">
@@ -114,36 +144,6 @@
                                             <tr>
                                                 <td>
                                                     <a href="/results/phone/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
-                                                </td>
-                                                <td>
-                                                    {{$item['total_row']}}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </table>
-                                </div>
-
-                            </div>
-                        </td>
-                        <td width="5%"></td>
-                        <td width="30%">
-                            <div class="title m-b-md">Find a site company</div>
-
-                            <div class="links">
-                                <form class="form-horizontal" role="form" method="POST" action="/mapping_company" enctype="multipart/form-data">
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="phone" value="true">
-                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
-                                    <input type="submit" id="submit" value="Submit"/>
-                                    <p>Will check only site company!</p>
-                                </form>
-
-                                <div style="height: 300px; overflow-y: scroll;">
-                                    <table>
-                                        @foreach($site_company as $item)
-                                            <tr>
-                                                <td>
-                                                    <a href="/results/company_name/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
                                                 </td>
                                                 <td>
                                                     {{$item['total_row']}}
@@ -216,7 +216,35 @@
                             </div>
                         </td>
                         <td width="5%"></td>
-                        <td width="30%"></td>
+                        <td width="30%">
+                            <div class="title m-b-md">Find a site company</div>
+
+                            <div class="links">
+                                <form class="form-horizontal" role="form" method="POST" action="/mapping_company" enctype="multipart/form-data">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="phone" value="true">
+                                    <input type="file" id="import" name="import" accept=".csv,.xls,.xlsx"><br/><br/>
+                                    <input type="submit" id="submit" value="Submit"/>
+                                    <p>Will check only site company!</p>
+                                </form>
+
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <table>
+                                        @foreach($site_company as $item)
+                                            <tr>
+                                                <td>
+                                                    <a href="/results/company_name/{{$item['id']}}" target="_blank">{{$item['name']}}</a>
+                                                </td>
+                                                <td>
+                                                    {{$item['total_row']}}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
+                                </div>
+
+                            </div>
+                        </td>
                     </tr>
 
                 </table>
