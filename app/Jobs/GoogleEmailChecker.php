@@ -54,7 +54,7 @@ class GoogleEmailChecker implements ShouldQueue
             $request = implode(' OR ', $emails);
 
             $client = new Client([
-                'base_uri' => 'https://www.google.com.ua/&q=%22shanna%407bridgesmarketing.com%22'
+                'base_uri' => 'https://www.google.com.ua/'
             ]);
 
             $googleResponse = $client->get('search', [
