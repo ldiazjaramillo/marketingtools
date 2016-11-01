@@ -65,10 +65,6 @@ Route::get('/results_email/{id}', function (Illuminate\Http\Request $request, $i
 
     $queue = \App\DataComparison::whereNull('score')->where(['import_id' => $id]);
 
-    $phoneSuccess = \App\GoogleCheckPhone::where('phone', '!=', '0')->where(['import_id' => $id]);
-    $phoneBad = \App\GoogleCheckPhone::where(['import_id' => $id])->where('phone', '=', '0');
-    $phoneQueue = \App\GoogleCheckPhone::whereNull('phone')->where(['import_id' => $id]);
-
     $type_report = \Illuminate\Support\Facades\Input::get('type');
     $data_source = \Illuminate\Support\Facades\Input::get('data_source');
 
@@ -113,7 +109,7 @@ Route::get('/results_email/{id}', function (Illuminate\Http\Request $request, $i
         }
 
     } else {
-        return view('report_email', compact('success', 'bad', 'queue', 'id', 'phoneSuccess', 'phoneBad', 'phoneQueue', 'checkEmailInGoogle'));
+        return view('report_email', compact('success', 'bad', 'queue', 'id', 'checkEmailInGoogle'));
     }
 
 });
