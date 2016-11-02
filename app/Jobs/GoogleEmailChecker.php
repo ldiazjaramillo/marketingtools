@@ -6,6 +6,7 @@ use App\DataComparison;
 use App\GoogleCheckEmail;
 use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -54,7 +55,8 @@ class GoogleEmailChecker implements ShouldQueue
             $request = implode(' OR ', $emails);
 
             $client = new Client([
-                'base_uri' => 'https://www.google.com.ua/'
+                'base_uri' => 'https://www.google.com.ua/',
+                'proxy'           => env('PROXY_HOST', '37.48.118.90').':'.env('PROXY_PORT', '13012')
             ]);
 
             $googleResponse = $client->get('search', [
@@ -80,7 +82,7 @@ class GoogleEmailChecker implements ShouldQueue
 
             return true;
 
-        } catch (\Exception $e){
+        } catch (ServerException $e){
             Bugsnag::notifyException($e);
         }
 
