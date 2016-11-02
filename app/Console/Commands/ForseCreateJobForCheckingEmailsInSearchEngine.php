@@ -63,7 +63,7 @@ class ForseCreateJobForCheckingEmailsInSearchEngine extends Command
                 foreach($allVariableEmailName as $nameEmail){
                     GoogleCheckEmail::create([
                         'import_id' => $itemData->import_id,
-                        'email' => $nameEmail,
+                        'email' => $nameEmail. '@' . $itemData->site,
                         'data_comparasion_id' => $itemData->id
                     ]);
                 }
