@@ -118,7 +118,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                         //Create queue for checking google email
                         $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
 
-                        foreach ($allVariantEmail as $nameForBadEmail) {
+                        /*foreach ($allVariantEmail as $nameForBadEmail) {
                             GoogleCheckEmail::create([
                                 'import_id' => $importInfo->import_id,
                                 'email' => $nameForBadEmail . '@' . $domain,
@@ -133,7 +133,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                                 'data_comparasion_id' => $data_id,
                                 'import_id' => $importInfo->import_id
                             ]))->onQueue('email_checker_in_google')
-                        );
+                        );*/
 
                         return false;
                     }
@@ -145,7 +145,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
                     $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
 
-                    foreach ($allVariantEmail as $nameForBadEmail) {
+                    /*foreach ($allVariantEmail as $nameForBadEmail) {
                         GoogleCheckEmail::create([
                             'import_id' => $importInfo->import_id,
                             'email' => $nameForBadEmail . '@' . $domain,
@@ -160,7 +160,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                             'data_comparasion_id' => $data_id,
                             'import_id' => $importInfo->import_id
                         ]))->onQueue('email_checker_in_google')
-                    );
+                    );*/
 
                 }
 
@@ -168,7 +168,7 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             $allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
 
-            foreach ($allVariantEmail as $nameForBadEmail) {
+            /*foreach ($allVariantEmail as $nameForBadEmail) {
                 GoogleCheckEmail::create([
                     'import_id' => $importInfo->import_id,
                     'email' => $nameForBadEmail . '@' . $domain,
@@ -183,7 +183,7 @@ class PushEmailForCheckingScore implements ShouldQueue
                     'data_comparasion_id' => $data_id,
                     'import_id' => $importInfo->import_id
                 ]))->onQueue('email_checker_in_google')
-            );
+            );*/
 
             //Log::warning('All score equal. Brute force email failed');
             DataComparison::where(['id' => $data_id])->update([
