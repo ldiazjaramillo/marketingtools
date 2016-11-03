@@ -72,10 +72,10 @@ class GoogleEmailChecker implements ShouldQueue
                 $email = str_replace('"', '', $email);
 
                 if(strpos($googleResponse, '<b>'.$email.'</b>') !== false){
-                    GoogleCheckEmail::where(['email' => trim($email), 'import_id' => $this->import_id])->update(['count_results' => 1, 'provider_name' => $provider_name]);
+                    GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id'], 'import_id' => $this->import_id])->update(['count_results' => 1, 'provider_name' => $provider_name]);
                     DataComparison::where(['id' => $this->data['data_comparasion_id']])->update(['email' => $email, 'score' => 99.99]);
                 } else {
-                    GoogleCheckEmail::where(['email' => trim($email), 'import_id' => $this->import_id])->update(['count_results' => 0, 'provider_name' => $provider_name]);
+                    GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id'], 'import_id' => $this->import_id])->update(['count_results' => 0, 'provider_name' => $provider_name]);
                 }
 
             }
