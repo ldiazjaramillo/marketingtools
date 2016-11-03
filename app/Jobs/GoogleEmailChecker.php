@@ -6,7 +6,6 @@ use App\DataComparison;
 use App\GoogleCheckEmail;
 use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -22,7 +21,7 @@ class GoogleEmailChecker implements ShouldQueue
 	protected $name = '';
 	protected $domain = '';
 	protected $import_id = '';
-    protected $request = '';
+
 	/**
 	 * Create a new job instance.
 	 *
@@ -43,48 +42,59 @@ class GoogleEmailChecker implements ShouldQueue
 	 */
 	public function handle()
 	{
-        try {
-            $provider_name = 'google';
 
-            $allVariantEmail = \App\DataComparison::getVariableEmailName($this->name, $this->domain);
+		$allVariantEmail = \App\DataComparison::getVariableEmailName($this->name, $this->domain);
 
-            $emails = [];
-            foreach ($allVariantEmail as $email){
-                $emails[] = '"'.$email.'@'.$this->domain.'"';
-            }
-            $request = implode(' OR ', $emails);
+		$googleClient = new \Serps\SearchEngine\Google\GoogleClient(new \Serps\HttpClient\CurlClient());
 
-            $client = new Client([
-                'base_uri' => 'https://www.google.com.ua/',
-                'proxy'           => env('PROXY_HOST', '37.48.118.90').':'.env('PROXY_PORT', '13012')
-            ]);
+		foreach ($allVariantEmail as $nameEmail) {
 
-            $googleResponse = $client->get('search', [
-                'query' => [
-                    'sclient' => 'psy-ab',
-                    'safe' => 'off',
-                    'source' => 'hp',
-                    'q' => $request
-                ]
-            ])->getBody()->getContents();
+		    $email = $nameEmail . '@' . $this->domain;
+            $count_result = 0;
 
-            foreach ($emails as $email){
-                $email = str_replace('"', '', $email);
 
-                if(strpos($googleResponse, '<b>'.$email.'</b>') !== false){
-                    GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id'], 'import_id' => $this->import_id])->update(['count_results' => 1, 'provider_name' => $provider_name]);
-                    DataComparison::where(['id' => $this->data['data_comparasion_id']])->update(['email' => $email, 'score' => 99.99]);
-                } else {
-                    GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id'], 'import_id' => $this->import_id])->update(['count_results' => 0, 'provider_name' => $provider_name]);
-                }
 
-            }
+                $provider_name = 'google';
+				//\Log::debug('Handle GoogleEmailChecker ' . $email);
+				// Tell the client to use a user agent
+                $userAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36";
+                $googleClient->request->setUserAgent($userAgent);
 
-            return true;
+				$googleUrl = new \Serps\SearchEngine\Google\GoogleUrl();
+				$googleUrl->setSearchTerm('"' . $email . '"');
 
-        } catch (ServerException $e){
-            Bugsnag::notifyException($e);
-        }
+				//\Log::debug('Start find email ' . $email . ' in Google');
+
+				$proxy = new Proxy(env('PROXY_HOST', '37.48.118.90'), env('PROXY_PORT', '13012'));
+				$response = $googleClient->query($googleUrl, $proxy);
+
+				$resultObject = $response->getDom()->getElementById('resultStats');
+
+				$isSuggestionResult = $response->cssQuery('.ct-cs .med')->length;
+
+				if (!is_null($resultObject) && $isSuggestionResult == false) {
+					$result_string = $resultObject->textContent;
+					$result_string = str_replace([' ', ' '], ['', ''], $result_string);
+					preg_match("/[0-9,]+/", $result_string, $result);
+					$count_result = (int)$result[0];
+				}
+
+
+			try{
+				//\Log::debug('Total results for ' . $email . ' ' . $count_result);
+
+                GoogleCheckEmail::where(['data_comparasion_id' => $this->data['data_comparasion_id'], 'count_results' => NULL])->update(['count_results' => 0]);
+				GoogleCheckEmail::where(['email' => trim($email), 'import_id' => $this->import_id])->update(['count_results' => $count_result, 'provider_name' => $provider_name]);
+
+				if ($count_result > 0) {
+					DataComparison::where(['id' => $this->data['data_comparasion_id']])->update(['email' => $email, 'score' => 99.99]);
+					return true;
+				}
+			} catch (\Exception $e){
+				Bugsnag::notifyException($e);
+			}
+
+		}
 
 	}
 }
