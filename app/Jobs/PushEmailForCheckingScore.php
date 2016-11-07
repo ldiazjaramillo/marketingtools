@@ -70,10 +70,19 @@ class PushEmailForCheckingScore implements ShouldQueue
                     if($count->count() == 1){
                         $logCallApi = $count->first();
 
-                        DataComparison::where(['id' => $data_id])->update([
+
+                        dispatch(
+                            (new UpdateTableEmailScore([
+                                'id' => $data_id,
+                                'score' => $logCallApi->score(),
+                                'email' => $email,
+                            ]))->onQueue('update_data_comparison')
+                        );
+
+                        /*DataComparison::where(['id' => $data_id])->update([
                             'score' => $logCallApi->score(),
                             'email' => $email
-                        ]);
+                        ]);*/
 
                         continue;
                     }
@@ -111,10 +120,19 @@ class PushEmailForCheckingScore implements ShouldQueue
                         //Log::notice('Select best score for ' . $email . ' ' . $score);
                         //Log::notice('JSON ' . json_encode($result));
 
-                        DataComparison::where(['id' => $data_id])->update([
+
+                        dispatch(
+                            (new UpdateTableEmailScore([
+                                'id' => $data_id,
+                                'score' => $score,
+                                'email' => $email,
+                            ]))->onQueue('update_data_comparison')
+                        );
+
+                        /*DataComparison::where(['id' => $data_id])->update([
                             'score' => $score,
                             'email' => $email
-                        ]);
+                        ]);*/
 
                         return true;
 
@@ -122,10 +140,18 @@ class PushEmailForCheckingScore implements ShouldQueue
 
                         //Log::warning('Catch all for ' . $email . ' score ' . $score);
 
-                        DataComparison::where(['id' => $data_id])->update([
+                        dispatch(
+                            (new UpdateTableEmailScore([
+                                'id' => $data_id,
+                                'score' => 0,
+                                'email' => false,
+                            ]))->onQueue('update_data_comparison')
+                        );
+
+                        /*DataComparison::where(['id' => $data_id])->update([
                             'score' => 0,
                             'email' => false
-                        ]);
+                        ]);*/
 
                         //Create queue for checking google email
                         //$allVariantEmail = \App\DataComparison::getVariableEmailName($importInfo->name, $domain);
