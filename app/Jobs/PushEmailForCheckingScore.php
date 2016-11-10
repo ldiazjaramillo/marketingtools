@@ -46,6 +46,8 @@ class PushEmailForCheckingScore implements ShouldQueue
 
             $variableName = \App\DataComparison::getVariableEmailName($name, $domain);
 
+            echo time()."\r\n";
+            echo 'start '."\r\n";
 
             if($variableName == 'finish'){
                 return true;
@@ -63,38 +65,22 @@ class PushEmailForCheckingScore implements ShouldQueue
 
                     $email = $name . '@' . $domain;
 
-                    //\Log::info('Request to apilayer for ' . $email);
-
-                    $count = LogCallApi::where(['email' => $email]);
-
-                    if($count->count() == 1){
-                        $logCallApi = $count->first();
-
-
-                        /*dispatch(
-                            (new UpdateTableEmailScore([
-                                'id' => $data_id,
-                                'score' => $logCallApi->score(),
-                                'email' => $email,
-                            ]))->onQueue('update_data_comparison')
-                        );*/
-
-                        DataComparison::where(['id' => $data_id])->update([
-                            'score' => $logCallApi->score(),
-                            'email' => $email
-                        ]);
-
-                        continue;
-                    }
-
                     file_put_contents($path_file, "\r\n" . 'https://apilayer.net/api/check?access_key=' . env('MAILBOX_API_KEY') . '&email=' . $email . '&smtp=1&format=1&catch_all=1' . "\r\n", FILE_APPEND);
                     $request = json_decode(file_get_contents('https://apilayer.net/api/check?access_key=' . env('MAILBOX_API_KEY') . '&email=' . $email . '&smtp=1&format=1&catch_all=1'), 1);
 
+                    echo time()."\r\n";
+                    echo $email."\r\n";
+
+                    echo 'score ' . $request['score'] . "\r\n";
+                    echo 'format_valid ' . $request['format_valid'] . "\r\n";
 
                     $log = ['import_id' => $importInfo->import_id, 'data_comparasion_id' => $importInfo->id];
 
                     $request['score'] = $request['score'] * 100;
+
+                    echo 'start insert'."\r\n";
                     LogCallApi::create(array_merge($log, $request));
+                    echo 'finish insert'."\r\n";
 
                     file_put_contents($path_file, 'Result response ' . "\r\n\r\n" . json_encode($request) . "\r\n\r\n", FILE_APPEND);
 
